@@ -17,10 +17,10 @@
   the iteration process.
 -->
 
-**Language/Version**: [e.g., Python 3.11, Swift 5.9, Rust 1.75 or NEEDS CLARIFICATION]  
-**Primary Dependencies**: [e.g., FastAPI, UIKit, LLVM or NEEDS CLARIFICATION]  
-**Storage**: [if applicable, e.g., PostgreSQL, CoreData, files or N/A]  
-**Testing**: [e.g., pytest, XCTest, cargo test or NEEDS CLARIFICATION]  
+**Language/Version**: [e.g., Python 3.11, Swift 5.9, Rust 1.75 or NEEDS CLARIFICATION]
+**Primary Dependencies**: [e.g., FastAPI, UIKit, LLVM or NEEDS CLARIFICATION]
+**Storage**: [if applicable, e.g., PostgreSQL, CoreData, files or N/A]
+**Testing**: N/A (Excluded per Constitution Rule 6)
 **Target Platform**: [e.g., Linux server, iOS 15+, WASM or NEEDS CLARIFICATION]
 **Project Type**: [single/web/mobile - determines source structure]  
 **Performance Goals**: [domain-specific, e.g., 1000 req/s, 10k lines/sec, 60 fps or NEEDS CLARIFICATION]  
@@ -31,7 +31,29 @@
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-[Gates determined based on constitution file]
+**Technology Stack Compliance**:
+- [ ] Frontend: Next.js, React, Tailwind CSS, TypeScript only
+- [ ] Backend: Python, FastAPI, openai-agents only
+- [ ] No unauthorized dependencies added without approval
+
+**Quality Standards**:
+- [ ] Code follows industry best practices and production-grade standards
+- [ ] UI is fully responsive and mobile-optimized
+- [ ] Performance meets production requirements; no compromises documented
+- [ ] Code is clean, professional, well-commented, and modular
+
+**Development Practices**:
+- [ ] Existing code reused; search conducted before creating new functions
+- [ ] DRY principle followed; no duplicate implementations
+- [ ] Dependencies are minimal and approved
+- [ ] Only explicitly requested features implemented; no additional functionality
+
+**Testing Compliance (CRITICAL - Rule 6)**:
+- [ ] NO unit tests included
+- [ ] NO integration tests included
+- [ ] NO E2E tests included
+- [ ] NO test files or test directories created
+- [ ] All verification will be manual or through other non-automated methods
 
 ## Project Structure
 
@@ -63,32 +85,25 @@ src/
 ├── cli/
 └── lib/
 
-tests/
-├── contract/
-├── integration/
-└── unit/
-
 # [REMOVE IF UNUSED] Option 2: Web application (when "frontend" + "backend" detected)
 backend/
-├── src/
-│   ├── models/
-│   ├── services/
-│   └── api/
-└── tests/
+└── src/
+    ├── models/
+    ├── services/
+    └── api/
 
 frontend/
-├── src/
-│   ├── components/
-│   ├── pages/
-│   └── services/
-└── tests/
+└── src/
+    ├── components/
+    ├── pages/
+    └── services/
 
 # [REMOVE IF UNUSED] Option 3: Mobile + API (when "iOS/Android" detected)
 api/
 └── [same as backend above]
 
 ios/ or android/
-└── [platform-specific structure: feature modules, UI flows, platform tests]
+└── [platform-specific structure: feature modules, UI flows]
 ```
 
 **Structure Decision**: [Document the selected structure and reference the real

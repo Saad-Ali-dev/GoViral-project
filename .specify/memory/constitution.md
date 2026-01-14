@@ -1,50 +1,85 @@
-# [PROJECT_NAME] Constitution
-<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
+<!--
+SYNC IMPACT REPORT
+------------------
+Version change: Initial → 1.0.0
+Modified principles: N/A (initial constitution)
+Added sections:
+  - Core Principles (6 principles)
+  - Technology & Quality Standards
+  - Development Practices
+  - Governance
+
+Templates requiring updates:
+  ✅ plan-template.md - Constitution Check section exists but needs principle-specific gates
+  ⚠ spec-template.md - No explicit testing constraint noted; may need "Tests: Excluded" markers
+  ⚠ tasks-template.md - Testing section needs "NOT APPLICABLE" or removal per Rule 6
+  ✅ No command template files found
+
+Follow-up TODOs: None
+-->
+
+# GoViral Constitution
 
 ## Core Principles
 
-### [PRINCIPLE_1_NAME]
-<!-- Example: I. Library-First -->
-[PRINCIPLE_1_DESCRIPTION]
-<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
+### Production Standards
+All code and deliverables MUST follow industry best practices and production-grade standards. Software MUST be developed using proven patterns, libraries, and approaches suitable for production deployment. Performance MUST NOT be compromised—any tradeoffs require explicit justification and user approval.
 
-### [PRINCIPLE_2_NAME]
-<!-- Example: II. CLI Interface -->
-[PRINCIPLE_2_DESCRIPTION]
-<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
+### Integrity & Research
+Do not hallucinate or fabricate information. When a specific fact, pattern, or approach is unknown, explicitly state "I don't know [specific thing]" and conduct online research to gather accurate information before proceeding. Accuracy and transparency are non-negotiable.
 
-### [PRINCIPLE_3_NAME]
-<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
-[PRINCIPLE_3_DESCRIPTION]
-<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
+### Technology Stack
+The technology stack is FIXED and MUST NOT be changed without explicit user approval:
+- **Frontend**: Next.js 16.1.1, React 19.2.3, React DOM 19.2.3, Tailwind CSS v4, TypeScript 5
+- **Backend**: Python ≥3.12, FastAPI ≥0.128.0, openai-agents ≥0.6.4
 
-### [PRINCIPLE_4_NAME]
-<!-- Example: IV. Integration Testing -->
-[PRINCIPLE_4_DESCRIPTION]
-<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
+### User Experience Standards
+The entire user interface (UI) MUST be fully responsive and work perfectly on mobile devices. Performance MUST meet production standards; no compromises allowed without explicit user approval and documented justification.
 
-### [PRINCIPLE_5_NAME]
-<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
-[PRINCIPLE_5_DESCRIPTION]
-<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
+### Code Quality & Reuse
+Reuse existing code—do NOT create duplicate versions of already written functionality (DRY principle). Search for existing functions and modules before creating new ones. Code MUST be clean, professional, well-commented, modular, and properly formatted.
 
-## [SECTION_2_NAME]
-<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
+### Scope Management
+Implement only explicitly requested features—no additional functionality or guess work. If a new dependency is required, ask for approval first. Minimize dependencies; only add what is absolutely necessary.
 
-[SECTION_2_CONTENT]
-<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
+## Technology & Quality Standards
 
-## [SECTION_3_NAME]
-<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
+**Frontend Stack**: Next.js, React, Tailwind CSS, TypeScript
+**Backend Stack**: Python, FastAPI, openai-agents
+**Testing**: NO unit, integration, or E2E tests (Rule 6)
+**Responsive Design**: Full mobile responsiveness required
+**Performance**: Production-grade performance with no compromises
 
-[SECTION_3_CONTENT]
-<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
+## Development Practices
+
+- Use industry-standard patterns, frameworks, and libraries appropriate for production software
+- Follow all production-level best practices: security, maintainability, scalability
+- Reuse existing functions and modules; search before creating new code
+- Add new dependencies only after explicit user approval; minimal-dependencies principle
+- Write clean, professional code with clear comments and modular structure
+- Format code consistently following project conventions
+- No guess work or additional features beyond explicit requirements
 
 ## Governance
-<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
 
-[GOVERNANCE_RULES]
-<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
+This Constitution governs all development activities. All code and decisions MUST comply with these principles.
 
-**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
-<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->
+**Compliance**:
+- Every pull request and code review MUST verify constitution compliance
+- Deviations from technology stack or core principles require explicit documentation
+- Violations of "no tests" rule (Rule 6) are prohibited
+
+**Amendments**:
+- Amendments require explicit user approval
+- Document changes with reasoning and impact analysis
+- Version MUST follow semantic versioning:
+  - MAJOR: Backward incompatible changes (principle removal or fundamental redefinition)
+  - MINOR: New principles or materially expanded guidance
+  - PATCH: Clarifications, wording fixes, non-semantic refinements
+
+**Review**:
+- Conduct regular compliance reviews
+- Update constitution as project requirements evolve
+- Propose amendments when practices conflict with stated principles
+
+**Version**: 1.0.0 | **Ratified**: 2026-01-14 | **Last Amended**: 2026-01-14
