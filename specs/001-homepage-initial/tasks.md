@@ -7,14 +7,14 @@
 
 | Metric | Count |
 |--------|-------|
-| Total Tasks | 19 |
+| Total Tasks | 21 |
 | Setup Tasks | 4 |
-| Foundational Tasks | 2 |
-| User Story 1 Tasks | 4 |
+| Foundational Tasks | 3 |
+| User Story 1 Tasks | 6 |
 | User Story 2 Tasks | 3 |
-| User Story 3 Tasks | 3 |
-| User Story 4 Tasks | 2 |
-| Polish Tasks | 1 |
+| User Story 3 Tasks | 2 |
+| User Story 4 Tasks | 1 |
+| Polish Tasks | 2 |
 
 ## Dependencies & Execution Order
 
