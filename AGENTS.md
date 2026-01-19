@@ -52,3 +52,7 @@ The folder for this part of the codebase is `/agent_backend/` in the root direct
 
 - **Ask First:** Before installing new `npm` packages or changing database schemas.
 - **Never:** Modify `.env` files, `node_modules/`.
+
+# Important Notes
+
+- Always use Context7 MCP when I need library/API documentation, code generation, setup or configuration steps without me having to explicitly ask.
