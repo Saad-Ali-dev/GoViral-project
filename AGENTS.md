@@ -56,3 +56,5 @@ The folder for this part of the codebase is `/agent_backend/` in the root direct
 # Important Notes
 
 - Always use Context7 MCP when I need library/API documentation, code generation, setup or configuration steps without me having to explicitly ask.
+
+- designs are in `/design/` directory in root repo along with the Figma Link to the designs.
