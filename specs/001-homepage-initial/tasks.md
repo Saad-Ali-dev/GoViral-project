@@ -68,10 +68,10 @@ Initialize Next.js project structure with proper directories.
 
 **Independent Test**: Run `ls -la web_app/src/` and verify all directories exist.
 
-- [ ] T001 Create project directory structure in `web_app/src/`
-- [ ] T002 [P] Create `web_app/src/app/layout.tsx` with Next.js root layout
-- [ ] T003 [P] Create `web_app/src/app/globals.css` with Tailwind CSS v4 imports
-- [ ] T004 [P] Create `web_app/src/lib/fonts.ts` with Poppins and Inter font configuration
+- [x] T001 Create project directory structure in `web_app/src/`
+- [x] T002 [P] Create `web_app/src/app/layout.tsx` with Next.js root layout
+- [x] T003 [P] Create `web_app/src/app/globals.css` with Tailwind CSS v4 imports
+- [x] T004 [P] Create `web_app/src/lib/fonts.ts` with Poppins and Inter font configuration
 
 ---
 
@@ -85,12 +85,12 @@ Create shared UI components and base styling.
 
 ### Typography & Global Styles
 
-- [ ] T005 Configure Tailwind CSS v4 in `web_app/tailwind.config.ts` with custom font variables
-- [ ] T006 [P] Create `web_app/src/app/page.tsx` as homepage entry point with basic structure
+- [x] T005 Configure Tailwind CSS v4 in `web_app/tailwind.config.ts` with custom font variables
+- [x] T006 [P] Create `web_app/src/app/page.tsx` as homepage entry point with basic structure
 
 ### Reusable UI Components
 
-- [ ] T007 [P] Create `web_app/src/components/ui/IconButton.tsx` reusable icon button component
+- [x] T007 [P] Create `web_app/src/components/ui/IconButton.tsx` reusable icon button component
 
 ---
 
@@ -104,7 +104,7 @@ Create shared UI components and base styling.
 
 ### Layout Components
 
-- [ ] T008 [US1] Create `web_app/src/components/layout/Navbar.tsx` desktop navbar with Homepage/Videos/Login links
+- [x] T008 [US1] Create `web_app/src/components/layout/Navbar.tsx` desktop navbar with Homepage/Videos/Login links
 - [ ] T009 [US1] Create `web_app/src/components/layout/Footer.tsx` footer with simple text
 
 ### Homepage Sections
