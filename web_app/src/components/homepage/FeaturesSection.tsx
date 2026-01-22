@@ -44,15 +44,17 @@ export default function FeaturesSection() {
         {features.map((feature) => (
           <div
             key={feature.id}
-            className="bg-[#212121] rounded-[30px] p-8 md:p-10 shadow-lg text-left"
+            className="bg-[#212121] rounded-[30px] p-8 md:p-10 shadow-lg text-left min-h-56"
           >
             <div className="flex flex-col items-start gap-4">
-              <div className="text-white">
-                <feature.icon size={40} />
+              <div className="flex justify-center items-center gap-4">
+                <div className="text-white">
+                  <feature.icon size={40} />
+                </div>
+                <h3 className="font-poppins font-bold text-xl md:text-2xl text-white">
+                  {feature.heading}
+                </h3>
               </div>
-              <h3 className="font-poppins font-bold text-xl md:text-2xl text-white">
-                {feature.heading}
-              </h3>
               <p className="font-inter text-[#B8B8B8] text-base md:text-lg leading-relaxed">
                 {feature.text}
               </p>

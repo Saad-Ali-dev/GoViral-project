@@ -1,1 +1,18 @@
 @import "tailwindcss";
+
+@theme {
+  --font-poppins: var(--font-poppins);
+  --font-inter: var(--font-inter);
+}
+
+@media (max-width: 639px) and (min-width: 400px) {
+}
+@media (max-width: 399px) {
+  .ftsize-small {
+    font-size: 30px;
+  }
+  .small-logo {
+    width: 80px;
+    height: 80px;
+  }
+}
