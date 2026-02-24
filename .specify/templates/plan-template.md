@@ -40,6 +40,7 @@
 - [ ] Code follows industry best practices and production-grade standards
 - [ ] UI is fully responsive and mobile-optimized
 - [ ] Performance meets production requirements; no compromises documented
+- [ ] SEO optimized for search engine ranking with good Lighthouse scores
 - [ ] Code is clean, professional, well-commented, and modular
 
 **Development Practices**:

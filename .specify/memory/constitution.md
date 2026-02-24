@@ -1,16 +1,13 @@
 <!--
 SYNC IMPACT REPORT
 ------------------
-Version change: Initial → 1.0.0
-Modified principles: N/A (initial constitution)
+Version change: 1.0.0 → 1.1.0
+Modified principles: N/A (new principle added)
 Added sections:
-  - Core Principles (6 principles)
-  - Technology & Quality Standards
-  - Development Practices
-  - Governance
+  - Performance & SEO Optimization (new Core Principle #7)
 
 Templates requiring updates:
-  ✅ plan-template.md - Constitution Check section exists but needs principle-specific gates
+  ✅ plan-template.md - Constitution Check section updated with SEO requirement
   ⚠ spec-template.md - No explicit testing constraint noted; may need "Tests: Excluded" markers
   ⚠ tasks-template.md - Testing section needs "NOT APPLICABLE" or removal per Rule 6
   ✅ No command template files found
@@ -71,6 +68,10 @@ Reuse existing code—do NOT create duplicate versions of already written functi
 
 Implement only explicitly requested features—no additional functionality or guess work. If a new dependency is required, ask for approval first. Minimize dependencies; only add what is absolutely necessary.
 
+### Performance & SEO Optimization
+
+The project MUST be fully performant and achieve good web benchmarks (e.g., Lighthouse scores). The application MUST be fully SEO optimized for Search Engine Ranking with strong SEO results and performance. This includes proper meta tags, semantic HTML, fast load times, and following SEO best practices. Performance optimizations are mandatory and not optional.
+
 ## Development Practices
 
 - Use industry-standard patterns, frameworks, and libraries appropriate for production software
@@ -106,4 +107,4 @@ This Constitution governs all development activities. All code and decisions MUS
 - Update constitution as project requirements evolve
 - Propose amendments when practices conflict with stated principles
 
-**Version**: 1.0.0 | **Ratified**: 2026-01-14 | **Last Amended**: 2026-01-14
+**Version**: 1.1.0 | **Ratified**: 2026-01-14 | **Last Amended**: 2026-02-24
