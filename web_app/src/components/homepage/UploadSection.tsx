@@ -1,4 +1,3 @@
-import React from "react"
 import { FaCloudArrowUp } from "react-icons/fa6"
 
 export default function UploadSection() {

@@ -1,6 +1,5 @@
 "use client"
 
-import React from "react"
 import Link from "next/link"
 import { FaCircleXmark } from "react-icons/fa6"
 

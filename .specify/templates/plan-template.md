@@ -33,7 +33,7 @@
 
 **Technology Stack Compliance**:
 - [ ] Frontend: Next.js, React, Tailwind CSS, TypeScript only
-- [ ] Backend: Python, FastAPI, openai-agents only
+- [ ] Backend: Python, FastAPI, LangChain, Google Gemini only
 - [ ] No unauthorized dependencies added without approval
 
 **Quality Standards**:

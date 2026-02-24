@@ -1,4 +1,3 @@
-// lib/fonts.ts
 import { Poppins, Inter } from "next/font/google"
 
 export const poppins = Poppins({

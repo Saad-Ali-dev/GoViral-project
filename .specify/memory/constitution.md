@@ -38,6 +38,7 @@ The application utilizes a **Dual-Backend Architecture**. Responsibilities are s
 
 - **Role**: Handles the User Interface, Authentication, Database interactions, and orchestration. acts as the main gateway.
 - **Stack**: Next.js 16.1.1, React 19.2.3, React DOM 19.2.3, Tailwind CSS v4, TypeScript 5.
+- **External dependencies/libraries**: Axios 1.13.2, react-icons 5.5.0.
 - **Database**: MongoDB (Connected via Next.js not python), mongoose 9.1.3.
 - **Responsibilities**:
   - Manage all User Authentication (Auth).
@@ -48,7 +49,7 @@ The application utilizes a **Dual-Backend Architecture**. Responsibilities are s
 #### 2. AI Agent Service (Python)
 
 - **Role**: A dedicated microservice specifically for AI Agent logic.
-- **Stack**: Python ≥3.12, FastAPI ≥0.128.0, openai-agents ≥0.6.4.
+- **Stack**: Python ≥3.12, FastAPI ≥0.128.0, LangChain (≥1.2.10), Google Gemini (via langchain-google-genai >= 4.2.1).
 - **Responsibilities**:
   - Host the AI Agents.
   - Expose endpoints (API) that the Next.js backend calls.
