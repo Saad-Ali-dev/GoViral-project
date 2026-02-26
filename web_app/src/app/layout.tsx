@@ -3,6 +3,7 @@ import "./globals.css"
 import { poppins, inter } from "../lib/fonts"
 import Navbar from "../components/layout/Navbar"
 import Footer from "../components/layout/Footer"
+import { ClerkProvider } from "@clerk/nextjs"
 
 export const metadata: Metadata = {
   title: "GoViral",
@@ -15,12 +16,14 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en">
-      <body className={`${poppins.variable} ${inter.variable} font-inter`}>
-        <Navbar />
-        {children}
-        <Footer />
-      </body>
-    </html>
+    <ClerkProvider>
+      <html lang="en">
+        <body className={`${poppins.variable} ${inter.variable} font-inter`}>
+          <Navbar />
+          {children}
+          <Footer />
+        </body>
+      </html>
+    </ClerkProvider>
   )
 }

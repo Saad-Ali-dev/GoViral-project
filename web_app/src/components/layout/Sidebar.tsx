@@ -54,11 +54,18 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
             Videos
           </Link>
           <Link
-            href="/login"
+            href="/sign-in"
             onClick={onClose}
             className="w-full bg-[#C7161C] text-white text-center font-semibold py-3 rounded-lg hover:bg-opacity-90 transition-opacity"
           >
             Login
+          </Link>
+          <Link
+            href="/sign-up"
+            onClick={onClose}
+            className="w-full bg-[#C7161C] text-white text-center font-semibold py-3 rounded-lg hover:bg-opacity-90 transition-opacity"
+          >
+            Sign Up
           </Link>
         </div>
       </div>

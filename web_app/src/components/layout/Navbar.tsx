@@ -45,10 +45,16 @@ export default function Navbar() {
             Videos
           </Link>
           <Link
-            href="/login"
+            href="/sign-in"
             className="px-4 py-1 bg-[#C7161C] rounded text-white font-medium hover:bg-opacity-90 transition-colors"
           >
             Login
+          </Link>
+          <Link
+            href="/sign-up"
+            className="px-4 py-1 bg-[#C7161C] rounded text-white font-medium hover:bg-opacity-90 transition-colors"
+          >
+            Sign Up
           </Link>
         </div>
 
