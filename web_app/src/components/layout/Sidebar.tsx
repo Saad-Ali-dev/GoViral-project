@@ -2,6 +2,7 @@
 
 import Link from "next/link"
 import { FaCircleXmark } from "react-icons/fa6"
+import { SignedIn, SignedOut, UserButton } from "@clerk/nextjs"
 
 interface SidebarProps {
   isOpen: boolean
@@ -28,13 +29,27 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
         }`}
       >
         {/* Close Button */}
-        <div className="flex justify-end mb-12">
+        <div className="flex justify-end mb-4">
           <button
             onClick={onClose}
             className="text-white hover:text-[#C7161C] transition-colors"
           >
             <FaCircleXmark size={32} />
           </button>
+        </div>
+
+        {/* User Avatar - Top Center (only when signed in) */}
+        <div className="flex justify-center mb-8">
+          <SignedIn>
+            <UserButton
+              afterSignOutUrl="/"
+              appearance={{
+                elements: {
+                  avatarBox: "w-24 h-24",
+                },
+              }}
+            />
+          </SignedIn>
         </div>
 
         {/* Navigation Links - Red Buttons */}
@@ -53,20 +68,22 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
           >
             Videos
           </Link>
-          <Link
-            href="/sign-in"
-            onClick={onClose}
-            className="w-full bg-[#C7161C] text-white text-center font-semibold py-3 rounded-lg hover:bg-opacity-90 transition-opacity"
-          >
-            Login
-          </Link>
-          <Link
-            href="/sign-up"
-            onClick={onClose}
-            className="w-full bg-[#C7161C] text-white text-center font-semibold py-3 rounded-lg hover:bg-opacity-90 transition-opacity"
-          >
-            Sign Up
-          </Link>
+          <SignedOut>
+            <Link
+              href="/sign-in"
+              onClick={onClose}
+              className="w-full bg-[#C7161C] text-white text-center font-semibold py-3 rounded-lg hover:bg-opacity-90 transition-opacity"
+            >
+              Login
+            </Link>
+            <Link
+              href="/sign-up"
+              onClick={onClose}
+              className="w-full bg-[#C7161C] text-white text-center font-semibold py-3 rounded-lg hover:bg-opacity-90 transition-opacity"
+            >
+              Sign Up
+            </Link>
+          </SignedOut>
         </div>
       </div>
     </>

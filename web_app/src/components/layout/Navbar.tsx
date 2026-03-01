@@ -4,6 +4,7 @@ import { useState } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { FaBars } from "react-icons/fa6"
+import { SignedIn, SignedOut, UserButton } from "@clerk/nextjs"
 import Sidebar from "./Sidebar"
 
 export default function Navbar() {
@@ -44,18 +45,30 @@ export default function Navbar() {
           >
             Videos
           </Link>
-          <Link
-            href="/sign-in"
-            className="px-4 py-1 bg-[#C7161C] rounded text-white font-medium hover:bg-opacity-90 transition-colors"
-          >
-            Login
-          </Link>
-          <Link
-            href="/sign-up"
-            className="px-4 py-1 bg-[#C7161C] rounded text-white font-medium hover:bg-opacity-90 transition-colors"
-          >
-            Sign Up
-          </Link>
+          <SignedOut>
+            <Link
+              href="/sign-in"
+              className="px-4 py-1 bg-[#C7161C] rounded text-white font-medium hover:bg-opacity-90 transition-colors"
+            >
+              Login
+            </Link>
+            <Link
+              href="/sign-up"
+              className="px-4 py-1 bg-[#C7161C] rounded text-white font-medium hover:bg-opacity-90 transition-colors"
+            >
+              Sign Up
+            </Link>
+          </SignedOut>
+          <SignedIn>
+            <UserButton
+              afterSignOutUrl="/"
+              appearance={{
+                elements: {
+                  avatarBox: "w-10 h-10",
+                },
+              }}
+            />
+          </SignedIn>
         </div>
 
         {/* Mobile Menu Toggle */}
