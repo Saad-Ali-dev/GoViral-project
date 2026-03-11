@@ -76,10 +76,22 @@ This document defines the data entities, relationships, validation rules, and st
 | `publicId`         | String     | Yes      | -         | Cloudinary public identifier for the video             |
 | `thumbnailUrl`     | String     | No       | -         | Thumbnail image URL from Cloudinary                    |
 | `aiResponse`       | AIResponse | No       | -         | AI-generated metadata (title, description, tags, etc.) |
+| `metadata`         | Metadata   | No       | -         | Original video metadata (format, dimensions, tags, etc.) |
 | `youtubeUrl`       | String     | No       | -         | YouTube video URL after publishing                     |
 | `youtubeVideoId`   | String     | No       | -         | YouTube video ID after publishing                      |
 | `createdAt`        | Date       | Yes      | -         | Upload initiation timestamp                            |
 | `updatedAt`        | Date       | Yes      | -         | Last update timestamp                                  |
+
+### Embedded Document: Metadata
+
+| Field              | Type     | Required | Description                                     |
+| ------------------ | -------- | -------- | ----------------------------------------------- |
+| `originalFilename` | String   | No       | Original filename of the uploaded video         |
+| `format`           | String   | No       | Video format: 'mp4', 'mov', 'avi', 'webm'       |
+| `width`            | Number   | No       | Video width in pixels                           |
+| `height`           | Number   | No       | Video height in pixels                          |
+| `aspectRatio`      | Number   | No       | Video aspect ratio (width / height)             |
+| `cloudinaryTags`   | String[] | No       | Auto-generated tags from Cloudinary analysis    |
 
 ### Embedded Document: AIResponse
 
@@ -109,7 +121,7 @@ This document defines the data entities, relationships, validation rules, and st
 5. **cloudinaryUrl**: Must be valid HTTPS URL from Cloudinary domain when present
 6. **publicId**: Must be non-empty string, unique across collection
 7. **error**: Required when status is 'failed'
-8. **format**: Must be one of: 'mp4', 'mov', 'avi', 'webm'
+8. **metadata.format**: Must be one of: 'mp4', 'mov', 'avi', 'webm' when present
 
 ### State Transitions
 
@@ -247,11 +259,20 @@ const videoSchema = new Schema({
   "_id": "ObjectId('507f1f77bcf86cd799439012')",
   "userId": "user_2abc123xyz",
   "originalFilename": "my_video.mp4",
-  "size": 15728640,
+  "fileSize": 15728640,
   "duration": 45.5,
   "status": "completed",
+  "publicId": "abc123",
   "cloudinaryUrl": "https://res.cloudinary.com/demo/video/upload/v1234567890/abc123.mp4",
   "thumbnailUrl": "https://res.cloudinary.com/demo/image/upload/v1234567890/abc123.jpg",
+  "metadata": {
+    "originalFilename": "my_video.mp4",
+    "format": "mp4",
+    "width": 1080,
+    "height": 1920,
+    "aspectRatio": 0.5625,
+    "cloudinaryTags": ["vertical", "portrait", "indoor"]
+  },
   "aiResponse": {
     "title": "Amazing Short Video!",
     "description": "Check out this amazing short-form video optimized for YouTube",
@@ -271,10 +292,19 @@ const videoSchema = new Schema({
   "_id": "ObjectId('507f1f77bcf86cd799439013')",
   "userId": "user_2abc123xyz",
   "originalFilename": "too_long.mp4",
-  "size": 5242880,
+  "fileSize": 5242880,
   "duration": 75.2,
   "status": "failed",
+  "publicId": "xyz789",
   "error": "Video duration exceeds limit. Maximum duration is 60 seconds.",
+  "metadata": {
+    "originalFilename": "too_long.mp4",
+    "format": "mp4",
+    "width": 1920,
+    "height": 1080,
+    "aspectRatio": 1.778,
+    "cloudinaryTags": ["landscape", "outdoor"]
+  },
   "createdAt": "ISODate('2026-03-10T14:10:00.000Z')",
   "updatedAt": "ISODate('2026-03-10T14:11:00.000Z')"
 }
