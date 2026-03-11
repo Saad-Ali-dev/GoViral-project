@@ -1,8 +1,9 @@
 # Quickstart Guide: Video Upload Feature
 
-**Feature**: 002-video-upload  
-**Date**: 2026-03-10  
-**Version**: 1.0.0
+**Feature**: 002-video-upload
+**Date**: 2026-03-10
+**Updated**: 2026-03-11
+**Version**: 1.1.0
 
 This guide provides step-by-step implementation instructions for the video upload feature with YouTube OAuth and Cloudinary integration.
 
@@ -847,7 +848,193 @@ export default function HomePage() {
 
 ---
 
-## Step 12: Test the Implementation
+## Step 12: Add SEO Metadata to Upload Page
+
+**File**: `web_app/src/app/upload/page.tsx`
+
+Add comprehensive SEO metadata using Next.js 16 Metadata API:
+
+```typescript
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'Upload Video - GoViral | AI-Powered YouTube SEO Optimization',
+  description: 'Upload your short-form videos to GoViral for AI-powered SEO optimization. Automatically generate titles, descriptions, tags, and thumbnails for YouTube.',
+  keywords: [
+    'video upload',
+    'YouTube SEO',
+    'AI optimization',
+    'short-form video',
+    'content creator tools',
+    'video marketing',
+    'YouTube shorts',
+  ],
+  authors: [{ name: 'GoViral Team' }],
+  openGraph: {
+    title: 'Upload Video - GoViral',
+    description: 'AI-powered YouTube SEO optimization for short-form videos',
+    type: 'website',
+    locale: 'en_US',
+    siteName: 'GoViral',
+    images: [
+      {
+        url: '/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'GoViral - AI-Powered YouTube SEO',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Upload Video - GoViral',
+    description: 'AI-powered YouTube SEO optimization',
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
+}
+```
+
+---
+
+## Step 13: Create Connect YouTube Button Component
+
+**File**: `web_app/src/components/layout/ConnectYouTubeButton.tsx`
+
+```typescript
+'use client'
+
+import { useUser } from '@clerk/nextjs'
+import { YouTubeIcon } from 'lucide-react' // or react-icons
+import { useEffect, useState } from 'react'
+import axios from 'axios'
+
+interface UserData {
+  youtubeAccessToken?: string
+  youtubeTokenExpiry?: string
+}
+
+export function ConnectYouTubeButton() {
+  const { isLoaded, isSignedIn, user } = useUser()
+  const [hasYouTubeConnection, setHasYouTubeConnection] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
+
+  useEffect(() => {
+    async function checkYouTubeConnection() {
+      if (!isLoaded || !isSignedIn) {
+        setIsLoading(false)
+        return
+      }
+
+      try {
+        const response = await axios.get('/api/user/youtube-status')
+        setHasYouTubeConnection(response.data.hasValidConnection)
+      } catch (error) {
+        console.error('Error checking YouTube connection:', error)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    checkYouTubeConnection()
+  }, [isLoaded, isSignedIn, user])
+
+  if (!isLoaded || !isSignedIn) {
+    return null
+  }
+
+  if (isLoading) {
+    return <div className="animate-pulse">Checking...</div>
+  }
+
+  if (hasYouTubeConnection) {
+    return (
+      <div className="flex items-center gap-2 text-green-600 px-4 py-2">
+        <YouTubeIcon className="w-5 h-5" />
+        <span className="text-sm font-medium">YouTube Connected</span>
+      </div>
+    )
+  }
+
+  return (
+    <form action="/api/auth/youtube">
+      <button
+        type="submit"
+        className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm font-medium"
+      >
+        <YouTubeIcon className="w-5 h-5" />
+        Connect YouTube
+      </button>
+    </form>
+  )
+}
+```
+
+---
+
+## Step 14: Add YouTube Status Check API Route
+
+**File**: `web_app/src/app/api/user/youtube-status/route.ts`
+
+```typescript
+import { NextRequest, NextResponse } from 'next/server'
+import { getAuth } from '@clerk/nextjs/server'
+import { User } from '@/models/User'
+import { connectToDatabase } from '@/lib/db'
+
+export async function GET(request: NextRequest) {
+  try {
+    const { userId } = getAuth(request as any)
+    if (!userId) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    await connectToDatabase()
+    const user = await User.findOne({ clerkId: userId }, { youtubeAccessToken: 1, youtubeTokenExpiry: 1 })
+
+    const hasValidConnection = 
+      user?.youtubeAccessToken && 
+      user.youtubeTokenExpiry && 
+      new Date(user.youtubeTokenExpiry) > new Date()
+
+    return NextResponse.json({ hasValidConnection })
+  } catch (error) {
+    console.error('YouTube status check error:', error)
+    return NextResponse.json(
+      { error: 'Failed to check YouTube connection status' },
+      { status: 500 }
+    )
+  }
+}
+```
+
+---
+
+## Step 15: Integrate Connect YouTube Button into Navbar/Sidebar
+
+**File**: `web_app/src/components/layout/Navbar.tsx` (or your navbar component)
+
+```typescript
+import { ConnectYouTubeButton } from './ConnectYouTubeButton'
+
+export function Navbar() {
+  return (
+    <nav className="navbar">
+      {/* ... existing navbar content */}
+      <div className="navbar-actions">
+        <ConnectYouTubeButton />
+        {/* ... other navbar items */}
+      </div>
+    </nav>
+  )
+}
+```
+
+---
+
+## Step 16: Test the Implementation
 
 ### Test Checklist
 
@@ -866,12 +1053,29 @@ export default function HomePage() {
    - [ ] Metadata is stored in database
    - [ ] Agent service is notified (dummy URL)
 
-3. **Error Handling**:
+3. **Connect YouTube Button**:
+   - [ ] Button visible in Navbar/Sidebar for users without YouTube connection
+   - [ ] Button click triggers OAuth flow
+   - [ ] Button shows "YouTube Connected" state after successful OAuth
+   - [ ] Button hidden/replaced for users with valid connection
+
+4. **SEO Optimization**:
+   - [ ] Upload page has correct title and description
+   - [ ] Open Graph tags present and correct
+   - [ ] Twitter Card tags present
+   - [ ] Page is indexable by search engines
+
+5. **Error Handling**:
    - [ ] OAuth denial shows appropriate error
    - [ ] Invalid file type shows error
    - [ ] File too large shows error
    - [ ] Video too long shows error
    - [ ] Network errors are handled gracefully
+
+6. **No State Persistence**:
+   - [ ] Upload cancels when user navigates away
+   - [ ] No upload state in localStorage/sessionStorage
+   - [ ] Fresh upload starts when user returns
 
 ---
 
@@ -904,6 +1108,15 @@ export default function HomePage() {
 2. Verify Cloudinary returns duration in metadata
 3. Add server-side validation in `/api/videos` route
 
+### Connect YouTube Button Not Showing
+
+**Problem**: Button doesn't appear in Navbar
+
+**Solutions**:
+1. Check user authentication status
+2. Verify `/api/user/youtube-status` endpoint is working
+3. Check browser console for errors
+
 ---
 
 ## Next Steps
@@ -918,5 +1131,5 @@ After completing this implementation:
 
 ---
 
-**Status**: ✅ Complete  
+**Status**: ✅ Complete
 **Ready for Implementation**: Yes

@@ -1,10 +1,10 @@
 # Implementation Plan: Video Upload with YouTube OAuth & Cloudinary
 
-**Branch**: `002-video-upload` | **Date**: 2026-03-10 | **Spec**: [spec.md](./spec.md)
+**Branch**: `002-video-upload` | **Date**: 2026-03-10 | **Updated**: 2026-03-11 | **Spec**: [spec.md](./spec.md)
 
 ## Summary
 
-Implement a complete video upload feature for GoViral that enables signed-in users to upload short-form videos (<60s, <50MB) to Cloudinary storage, with integrated YouTube OAuth 2.0 verification for future publishing. The feature includes frontend security checks, real-time upload progress, metadata storage in MongoDB, and agent service notification (dummy URL for now). YouTube OAuth flow ensures users grant upload/publish permissions before video processing begins.
+Implement a complete video upload feature for GoViral that enables signed-in users to upload short-form videos (<60s, <50MB) to Cloudinary storage, with integrated YouTube OAuth 2.0 verification for future publishing. The feature includes frontend security checks (pre-upload: file type/size; post-upload: duration), real-time upload progress, metadata storage in MongoDB, and agent service notification (dummy URL for now). YouTube OAuth flow is triggered by two conditions: (1) when upload process starts after login check, and (2) via a dedicated 'Connect YouTube' button in the Navbar/Sidebar. The feature is fully SEO and performance optimized with no upload state persistence.
 
 ## Technical Context
 
@@ -14,9 +14,9 @@ Implement a complete video upload feature for GoViral that enables signed-in use
 **Testing**: N/A (Excluded per Constitution Rule 6)
 **Target Platform**: Web application (Next.js SSR/CSR hybrid)
 **Project Type**: web (frontend + backend in Next.js, AI Agent Service deferred to future feature)
-**Performance Goals**: Upload progress updates in real-time, p95 < 200ms for API responses, Lighthouse score >90
-**Constraints**: Video max 60s duration, max 50MB size, formats: MP4/MOV/AVI; SEO-optimized pages; mobile-responsive UI
-**Scale/Scope**: Single upload page (/upload), OAuth callback endpoint, API routes for signing and metadata storage
+**Performance Goals**: Upload progress updates in real-time, p95 < 200ms for API responses, Lighthouse score >90 for performance/accessibility/best practices
+**Constraints**: Video max 60s duration, max 50MB size, formats: MP4/MOV/AVI; SEO-optimized pages with dynamic metadata; mobile-responsive UI; no upload state persistence
+**Scale/Scope**: Upload page (/upload) with centered widget, OAuth callback endpoint, API routes for signing and metadata storage, 'Connect YouTube' button in Navbar/Sidebar
 
 ## Constitution Check
 
@@ -67,30 +67,34 @@ specs/002-video-upload/
 
 ```text
 web_app/
-├── app/
-│   ├── upload/
-│   │   └── page.tsx           # Upload page with CldUploadWidget centered
-│   └── api/
-│       ├── auth/
-│       │   └── youtube/
-│       │       ├── route.ts   # Initiate YouTube OAuth flow
-│       │       └── callback/
-│       │           └── route.ts # Handle OAuth callback
-│       ├── cloudinary/
-│       │   └── sign-cloudinary-params/
-│       │       └── route.ts   # Sign Cloudinary upload params
-│       └── videos/
-│           └── route.ts       # Store video metadata after upload
-├── components/
-│   └── upload/
-│       ├── VideoUploadWidget.tsx  # Wrapper for CldUploadWidget with progress
-│       └── UploadProgress.tsx     # Progress indicator component
-├── lib/
-│   ├── cloudinary.ts        # Cloudinary configuration
-│   ├── youtube-oauth.ts     # YouTube OAuth utilities
-│   └── db.ts                # MongoDB connection
-├── models/
-│   └── Video.ts             # VideoUpload schema with User relationship
+├── src/
+│   ├── app/
+│   │   ├── upload/
+│   │   │   └── page.tsx           # Upload page with CldUploadWidget centered, SEO metadata
+│   │   └── api/
+│   │       ├── auth/
+│   │       │   └── youtube/
+│   │       │       ├── route.ts   # Initiate YouTube OAuth flow
+│   │       │       └── callback/
+│   │       │           └── route.ts # Handle OAuth callback
+│   │       ├── cloudinary/
+│   │       │   └── sign-cloudinary-params/
+│   │       │       └── route.ts   # Sign Cloudinary upload params
+│   │       └── videos/
+│   │           └── route.ts       # Store video metadata after upload
+│   ├── components/
+│   │   ├── upload/
+│   │   │   ├── VideoUploadWidget.tsx  # Wrapper for CldUploadWidget with progress
+│   │   │   └── UploadProgress.tsx     # Progress indicator component
+│   │   └── layout/
+│   │       └── ConnectYouTubeButton.tsx  # YouTube connection button for Navbar/Sidebar
+│   ├── lib/
+│   │   ├── cloudinary.ts        # Cloudinary configuration
+│   │   ├── youtube-oauth.ts     # YouTube OAuth utilities
+│   │   └── db.ts                # MongoDB connection
+│   └── models/
+│       ├── Video.ts             # VideoUpload schema with User relationship
+│       └── User.ts              # User schema with YouTube credentials
 └── .env.local               # Environment variables (already configured)
 ```
 
@@ -110,7 +114,7 @@ web_app/
 
 **Decision**: Use `CldUploadWidget` from `next-cloudinary` with signed uploads via `/api/cloudinary/sign-cloudinary-params` endpoint
 
-**Rationale**: 
+**Rationale**:
 - Signed uploads provide better security and control over upload parameters
 - CldUploadWidget provides built-in progress tracking, multiple file source support, and customizable UI
 - Upload preset 'GoViral-Video' already configured in Cloudinary console
@@ -238,6 +242,84 @@ const { tokens } = await oauth2Client.getToken(code);
 - Status enum: pending, processing, completed, failed, published
 - Index on clerkId for efficient user video queries
 
+### Research 6: SEO Optimization for Upload Page
+
+**Decision**: Implement comprehensive SEO optimization for /upload page using Next.js 16 App Router metadata API
+
+**Rationale**:
+- Next.js 16 App Router provides built-in metadata API for dynamic SEO
+- Metadata includes title, description, Open Graph tags, Twitter cards
+- Semantic HTML structure improves crawlability
+- Fast load times contribute to better search rankings
+- Performance optimization aligns with Constitution Principle #7
+
+**Implementation pattern**:
+```tsx
+// app/upload/page.tsx
+export const metadata = {
+  title: 'Upload Video - GoViral | AI-Powered YouTube SEO Optimization',
+  description: 'Upload your short-form videos to GoViral for AI-powered SEO optimization. Automatically generate titles, descriptions, tags, and thumbnails for YouTube.',
+  keywords: ['video upload', 'YouTube SEO', 'AI optimization', 'short-form video', 'content creator tools'],
+  openGraph: {
+    title: 'Upload Video - GoViral',
+    description: 'AI-powered YouTube SEO optimization for short-form videos',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Upload Video - GoViral',
+    description: 'AI-powered YouTube SEO optimization',
+  },
+}
+```
+
+### Research 7: Connect YouTube Button Placement
+
+**Decision**: Implement 'Connect YouTube' button in Navbar/Sidebar with conditional rendering based on OAuth status
+
+**Rationale**:
+- Provides proactive YouTube connection without interrupting upload flow
+- Improves user experience by allowing setup at user's convenience
+- Button visibility controlled by checking youtubeCredentials in User document
+- Consistent placement in main navigation ensures discoverability
+
+**Implementation pattern**:
+```tsx
+// components/layout/ConnectYouTubeButton.tsx
+async function ConnectYouTubeButton() {
+  const user = await getCurrentUser();
+  const hasYouTubeConnection = user?.youtubeAccessToken && 
+    new Date(user.youtubeTokenExpiry) > new Date();
+
+  if (hasYouTubeConnection) {
+    return <ConnectedIndicator />;
+  }
+
+  return (
+    <form action="/api/auth/youtube">
+      <button type="submit">Connect YouTube</button>
+    </form>
+  );
+}
+```
+
+### Research 8: No Upload State Persistence Strategy
+
+**Decision**: Implement ephemeral upload state with no persistence for resumeability
+
+**Rationale**:
+- Per spec requirement FR-010: no upload state persistence
+- Simplifies implementation and reduces database writes
+- Upload cancelled if user navigates away
+- State managed entirely in client-side React component state
+- Aligns with short-form video use case (quick uploads)
+
+**Implementation approach**:
+- Use React useState/useEffect for upload progress state
+- No localStorage/sessionStorage persistence
+- No background sync or service workers
+- Upload widget unmount = upload cancelled
+
 ---
 
 ## Phase 1: Design & Contracts
@@ -247,20 +329,29 @@ const { tokens } = await oauth2Client.getToken(code);
 See [data-model.md](./data-model.md) for complete entity definitions, validation rules, and state transitions.
 
 **Key Entities**:
-1. **User** (existing, extended): YouTube OAuth credentials embedded
-2. **VideoUpload**: New collection for upload tracking
-3. **VideoMetadata**: Embedded in VideoUpload document
+1. **User** (existing, extended): YouTube OAuth credentials embedded (accessToken, refreshToken, tokenExpiry)
+2. **Video**: Collection for video upload tracking (userId/clerkId, cloudinaryUrl, thumbnailUrl, size, duration, status, aiResponse)
 
 ### API Contracts
 
 See [contracts/](./contracts/) for OpenAPI specification.
 
 **Endpoints**:
-1. `POST /api/auth/youtube` - Initiate YouTube OAuth flow
+1. `GET /api/auth/youtube` - Initiate YouTube OAuth flow (triggered by upload or Connect YouTube button)
 2. `GET /api/auth/youtube/callback` - Handle OAuth callback
 3. `POST /api/cloudinary/sign-cloudinary-params` - Sign Cloudinary upload parameters
 4. `POST /api/videos` - Store video metadata after upload
 5. `GET /api/videos/[id]` - Get video upload status
+
+### Security Checks Order
+
+**Pre-upload checks** (run before upload starts):
+- File type validation (MP4, MOV, AVI only)
+- File size validation (< 50MB)
+
+**Post-upload checks** (run after Cloudinary response):
+- Video duration validation (< 60 seconds)
+- Duration check runs after receiving Cloudinary response with duration metadata
 
 ### Quickstart Guide
 
@@ -274,11 +365,13 @@ See [quickstart.md](./quickstart.md) for implementation steps and code examples.
 2. **YouTube OAuth**: Implement OAuth initiation and callback routes
 3. **Cloudinary**: Implement signing endpoint and upload widget
 4. **Video Model**: Create Video.ts schema with validation
-5. **Upload Flow**: Build /upload page with centered widget and progress
+5. **Upload Flow**: Build /upload page with centered widget, progress, and SEO metadata
 6. **Metadata Storage**: Store video data and notify agent service (dummy URL)
 7. **Error Handling**: Implement comprehensive error messages per spec
 8. **UI Polish**: Responsive design, loading states, success/error feedback
+9. **Connect YouTube Button**: Add button to Navbar/Sidebar with conditional rendering
+10. **SEO Optimization**: Ensure /upload page has complete metadata and semantic HTML
 
 ---
 
-**Last updated**: 2026-03-10 | **Constitution Version**: 1.1.0 | **Compliance**: ✓
+**Last updated**: 2026-03-11 | **Constitution Version**: 1.1.0 | **Compliance**: ✓
