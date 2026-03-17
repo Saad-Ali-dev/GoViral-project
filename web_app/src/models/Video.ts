@@ -56,7 +56,7 @@ const videoSchema = new mongoose.Schema<IVideo>(
     youtubeUrl: { type: String },
     youtubeVideoId: { type: String },
     metadata: {
-      resourceType: Number,
+      resourceType: String,
       width: Number,
       height: Number,
       aspectRatio: Number,
