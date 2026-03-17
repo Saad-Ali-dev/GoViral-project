@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
-import { getAuth } from "@clerk/nextjs/server"
+import { auth } from "@clerk/nextjs/server"
 import { signCloudinaryParams } from "@/lib/cloudinary"
 
 /**
@@ -9,8 +9,8 @@ import { signCloudinaryParams } from "@/lib/cloudinary"
 export async function POST(request: NextRequest) {
   try {
     // Check authentication
-    const auth = await getAuth(request as any)
-    if (!auth.userId) {
+    const { userId } = await auth()
+    if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 

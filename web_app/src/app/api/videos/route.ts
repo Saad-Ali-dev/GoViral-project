@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
-import { getAuth } from "@clerk/nextjs/server"
+import { auth } from "@clerk/nextjs/server"
 import { Video } from "@/models/Video"
 import dbConnect from "@/lib/db"
 import axios from "axios"
@@ -11,8 +11,8 @@ import axios from "axios"
 export async function POST(request: NextRequest) {
   try {
     // Check authentication
-    const auth = await getAuth(request as any)
-    if (!auth.userId) {
+    const { userId } = await auth()
+    if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
 
     // Create video document
     const video = await Video.create({
-      userId: auth.userId,
+      userId,
       cloudinaryUrl,
       publicId,
       size,
@@ -108,8 +108,8 @@ export async function POST(request: NextRequest) {
 export async function GET(request: NextRequest) {
   try {
     // Check authentication
-    const auth = await getAuth(request as any)
-    if (!auth.userId) {
+    const { userId } = await auth()
+    if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
@@ -122,7 +122,7 @@ export async function GET(request: NextRequest) {
     await dbConnect()
 
     // Build query
-    const query: any = { userId: auth.userId }
+    const query: any = { userId }
     if (status) {
       query.status = status
     }

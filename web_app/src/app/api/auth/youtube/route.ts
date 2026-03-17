@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
-import { getAuth } from "@clerk/nextjs/server"
+import { auth } from "@clerk/nextjs/server"
 import { generateYouTubeAuthUrl } from "@/lib/youtube-oauth"
 import { User } from "@/models/User"
 import dbConnect from "@/lib/db"
@@ -11,15 +11,15 @@ import dbConnect from "@/lib/db"
 export async function GET(request: NextRequest) {
   try {
     // Check authentication
-    const auth = await getAuth(request as any)
-    if (!auth.userId) {
+    const { userId } = await auth()
+    if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
     // Check if user already has valid YouTube credentials
     await dbConnect()
     const user = await User.findOne(
-      { clerkId: auth.userId },
+      { clerkId: userId },
       { youtubeAccessToken: 1, youtubeTokenExpiry: 1 },
     )
 

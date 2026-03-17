@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
-import { getAuth } from "@clerk/nextjs/server"
+import { auth } from "@clerk/nextjs/server"
 import { User } from "../../../../models/User"
 import dbConnect from "../../../../lib/db"
 import { isTokenExpired } from "../../../../lib/youtube-oauth"
@@ -11,8 +11,8 @@ import { isTokenExpired } from "../../../../lib/youtube-oauth"
 export async function GET(request: NextRequest) {
   try {
     // Check authentication
-    const auth = await getAuth(request as any)
-    if (!auth.userId) {
+    const { userId } = await auth()
+    if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
 
     // Get user's YouTube credentials
     const user = await User.findOne(
-      { clerkId: auth.userId },
+      { clerkId: userId },
       {
         youtubeAccessToken: 1,
         youtubeRefreshToken: 1,

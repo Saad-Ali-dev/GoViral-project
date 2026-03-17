@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
-import { getAuth } from "@clerk/nextjs/server"
+import { auth } from "@clerk/nextjs/server"
 import { Video } from "@/models/Video"
 import dbConnect from "@/lib/db"
 
@@ -13,8 +13,8 @@ export async function GET(
 ) {
   try {
     // Check authentication
-    const auth = await getAuth(request as any)
-    if (!auth.userId) {
+    const { userId } = await auth()
+    if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
@@ -27,7 +27,7 @@ export async function GET(
     // Get video
     const video = await Video.findOne({
       _id: id,
-      userId: auth.userId,
+      userId,
     })
 
     if (!video) {
