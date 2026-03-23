@@ -2,12 +2,13 @@ import mongoose from "mongoose"
 
 const userSchema = new mongoose.Schema(
   {
-    clerkId: { type: String, required: true, unique: true },
+    clerkId: { type: String, required: true, unique: true, index: true },
     name: { type: String, required: true },
-    email: { type: String, required: true, unique: true },
-    youtubeAccessToken: String,
-    youtubeRefreshToken: String,
-    youtubeTokenExpiry: Date,
+    email: { type: String, required: true, unique: true, index: true },
+    youtubeAccessToken: { type: String }, // Encrypted
+    youtubeRefreshToken: { type: String }, // Encrypted
+    youtubeTokenExpiry: { type: Date },
+    channelId: { type: String },
   },
   {
     timestamps: true,

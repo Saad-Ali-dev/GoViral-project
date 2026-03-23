@@ -1,6 +1,6 @@
-import HeroSection from "../components/homepage/HeroSection"
-import UploadSection from "../components/homepage/UploadSection"
-import FeaturesSection from "../components/homepage/FeaturesSection"
+import HeroSection from "@/components/homepage/HeroSection"
+import UploadSection from "@/components/homepage/UploadSection"
+import FeaturesSection from "@/components/homepage/FeaturesSection"
 
 export default function Home() {
   return (

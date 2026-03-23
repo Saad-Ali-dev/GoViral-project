@@ -1,0 +1,525 @@
+# API Contracts: Video Upload Feature
+
+**Feature**: 002-video-upload
+**Date**: 2026-03-10
+**Updated**: 2026-03-11
+**Version**: 1.1.0
+
+This document defines the API contracts for the video upload feature, including YouTube OAuth flow and Cloudinary integration.
+
+---
+
+## OpenAPI Specification
+
+```yaml
+openapi: 3.0.3
+info:
+  title: GoViral Video Upload API
+  description: API for video upload, YouTube OAuth, and metadata management
+  version: 1.1.0
+  contact:
+    name: GoViral Team
+
+servers:
+  - url: http://localhost:3000/api
+    description: Development server
+  - url: https://goviral.vercel.app/api
+    description: Production server
+
+tags:
+  - name: YouTube OAuth
+    description: YouTube OAuth 2.0 authentication endpoints
+  - name: Cloudinary
+    description: Cloudinary upload signing endpoints
+  - name: Videos
+    description: Video metadata management endpoints
+  - name: User
+    description: User profile and YouTube connection status endpoints
+
+paths:
+  /auth/youtube:
+    get:
+      tags:
+        - YouTube OAuth
+      summary: Initiate YouTube OAuth flow
+      description: |
+        Redirects user to Google OAuth consent screen with required YouTube scopes.
+        Must be called when user initiates upload and has no valid YouTube credentials.
+      operationId: initiateYouTubeOAuth
+      security:
+        - bearerAuth: []
+      responses:
+        '302':
+          description: Redirect to Google OAuth consent screen
+          headers:
+            Location:
+              schema:
+                type: string
+              description: Google OAuth authorization URL
+        '401':
+          description: User not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /auth/youtube/callback:
+    get:
+      tags:
+        - YouTube OAuth
+      summary: Handle YouTube OAuth callback
+      description: |
+        Receives authorization code from Google, exchanges for tokens,
+        stores encrypted credentials in User document, and redirects to /upload.
+      operationId: handleYouTubeOAuthCallback
+      parameters:
+        - name: code
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Authorization code from Google
+        - name: error
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Error message if user denied consent
+      responses:
+        '302':
+          description: Redirect to /upload page (success) or /upload?error=... (failure)
+          headers:
+            Location:
+              schema:
+                type: string
+        '400':
+          description: Invalid authorization code or missing parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server error during token exchange
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /cloudinary/sign-cloudinary-params:
+    post:
+      tags:
+        - Cloudinary
+      summary: Sign Cloudinary upload parameters
+      description: |
+        Generates signed parameters for secure Cloudinary video uploads.
+        Required for CldUploadWidget with signed uploads.
+      operationId: signCloudinaryParams
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                paramsToSign:
+                  type: object
+                  description: Upload parameters to sign
+                  properties:
+                    timestamp:
+                      type: number
+                      description: Unix timestamp
+                    upload_preset:
+                      type: string
+                      example: GoViral-Video
+                    folder:
+                      type: string
+                      example: goviral/videos
+              required:
+                - paramsToSign
+      responses:
+        '200':
+          description: Signed parameters for Cloudinary upload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CloudinarySignature'
+        '401':
+          description: User not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server error during signing
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /videos:
+    post:
+      tags:
+        - Videos
+      summary: Store video metadata after upload
+      description: |
+        Stores video metadata from Cloudinary upload in MongoDB.
+        Creates VideoUpload document and triggers agent service notification.
+      operationId: storeVideoMetadata
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VideoMetadataInput'
+      responses:
+        '201':
+          description: Video metadata stored successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VideoUpload'
+        '400':
+          description: Invalid metadata (duration > 60s, missing fields)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: User not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server error during storage
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    get:
+      tags:
+        - Videos
+      summary: Get user's video uploads
+      description: |
+        Retrieves list of video uploads for authenticated user.
+        Returns most recent uploads first.
+      operationId: getUserVideos
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+            minimum: 1
+            maximum: 100
+          description: Number of videos to return
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [pending, processing, completed, failed, published]
+          description: Filter by status
+      responses:
+        '200':
+          description: List of user's videos
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/VideoUpload'
+        '401':
+          description: User not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /videos/{videoId}:
+    get:
+      tags:
+        - Videos
+      summary: Get video upload by ID
+      description: |
+        Retrieves specific video upload details by ID.
+      operationId: getVideoById
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: videoId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: MongoDB ObjectId of video upload
+      responses:
+        '200':
+          description: Video upload details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VideoUpload'
+        '404':
+          description: Video not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: User not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /user/youtube-status:
+    get:
+      tags:
+        - User
+      summary: Get user's YouTube connection status
+      description: |
+        Checks if the authenticated user has a valid YouTube connection
+        (non-expired access token). Used to determine Connect YouTube button visibility.
+      operationId: getYouTubeStatus
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: YouTube connection status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  hasValidConnection:
+                    type: boolean
+                    description: Whether user has valid (non-expired) YouTube credentials
+        '401':
+          description: User not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: Clerk authentication user token
+
+  schemas:
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Error message
+        code:
+          type: string
+          description: Error code
+      required:
+        - error
+
+    CloudinarySignature:
+      type: object
+      properties:
+        signature:
+          type: string
+          description: Generated signature for upload parameters
+        api_key:
+          type: string
+          description: Cloudinary API key
+        cloud_name:
+          type: string
+          description: Cloudinary cloud name
+        timestamp:
+          type: number
+          description: Unix timestamp
+      required:
+        - signature
+        - api_key
+        - cloud_name
+        - timestamp
+
+    VideoMetadataInput:
+      type: object
+      properties:
+        cloudinaryUrl:
+          type: string
+          format: uri
+          description: Secure URL from Cloudinary
+        publicId:
+          type: string
+          description: Cloudinary public identifier
+        fileSize:
+          type: integer
+          description: File size in bytes
+        duration:
+          type: number
+          description: Video duration in seconds
+        format:
+          type: string
+          enum: [mp4, mov, avi]
+          description: Video format
+        originalFilename:
+          type: string
+          description: Original filename
+        width:
+          type: integer
+          description: Video width in pixels
+        height:
+          type: integer
+          description: Video height in pixels
+      required:
+        - cloudinaryUrl
+        - publicId
+        - fileSize
+        - duration
+        - format
+
+    VideoUpload:
+      type: object
+      properties:
+        _id:
+          type: string
+          description: MongoDB ObjectId
+        clerkId:
+          type: string
+          description: User Clerk ID
+        cloudinaryUrl:
+          type: string
+          format: uri
+          description: Cloudinary secure URL
+        publicId:
+          type: string
+          description: Cloudinary public identifier
+        fileSize:
+          type: integer
+          description: File size in bytes
+        duration:
+          type: number
+          description: Video duration in seconds
+        format:
+          type: string
+          enum: [mp4, mov, avi]
+          description: Video format
+        status:
+          type: string
+          enum: [pending, processing, completed, failed, published]
+          description: Upload status
+        error:
+          type: string
+          description: Error message if failed
+        agentServiceNotified:
+          type: boolean
+          description: Whether agent service was notified
+        youtubePublishAttempted:
+          type: boolean
+          description: Whether YouTube publish was attempted
+        youtubeVideoId:
+          type: string
+          description: YouTube video ID after publishing
+        metadata:
+          type: object
+          properties:
+            resourceType:
+              type: string
+            width:
+              type: integer
+            height:
+              type: integer
+            aspectRatio:
+              type: number
+            tags:
+              type: array
+              items:
+                type: string
+            originalFilename:
+              type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+        - _id
+        - clerkId
+        - cloudinaryUrl
+        - publicId
+        - fileSize
+        - duration
+        - format
+        - status
+        - createdAt
+        - updatedAt
+```
+
+---
+
+## YouTube OAuth Flow Contract
+
+See [youtube-oauth.md](./youtube-oauth.md) for detailed OAuth flow specification.
+
+---
+
+## Error Handling
+
+### Standard Error Response Format
+
+```json
+{
+  "error": "Human-readable error message",
+  "code": "ERROR_CODE"
+}
+```
+
+### Error Codes
+
+| Code | HTTP Status | Description |
+|------|-------------|-------------|
+| `UNAUTHORIZED` | 401 | User not authenticated |
+| `INVALID_TOKEN` | 401 | Invalid or expired authentication token |
+| `MISSING_PARAMS` | 400 | Required parameters missing |
+| `INVALID_DURATION` | 400 | Video duration exceeds 60 seconds |
+| `INVALID_FORMAT` | 400 | Unsupported video format |
+| `OAUTH_DENIED` | 403 | User denied OAuth consent |
+| `OAUTH_FAILED` | 500 | OAuth flow failed |
+| `CLOUDINARY_ERROR` | 500 | Cloudinary upload failed |
+| `DATABASE_ERROR` | 500 | MongoDB operation failed |
+| `NOT_FOUND` | 404 | Resource not found |
+
+---
+
+## Security Requirements
+
+1. **Authentication**: All endpoints except `/auth/youtube/callback` require valid Clerk authentication
+2. **Authorization**: Users can only access their own video uploads
+3. **Encryption**: YouTube credentials must be encrypted at rest
+4. **HTTPS**: All production endpoints must use HTTPS
+5. **CORS**: API routes should only accept requests from allowed origins
+
+---
+
+**Status**: ✅ Complete  
+**Ready for Implementation**: Yes
