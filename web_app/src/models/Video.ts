@@ -63,7 +63,7 @@ const videoSchema = new mongoose.Schema<IVideo>(
       tags: [String],
       originalFilename: String,
     },
-    agentServiceNotified: { type: Boolean, default: false },
+    agentServiceNotified: { type: Boolean, default: true },
   },
   {
     timestamps: true,

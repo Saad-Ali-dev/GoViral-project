@@ -5,7 +5,10 @@ import { useUser } from "@clerk/nextjs"
 import { useRouter, useSearchParams } from "next/navigation"
 import { VideoUploadWidget } from "../../components/upload/VideoUploadWidget"
 import { UploadProgress } from "../../components/upload/UploadProgress"
-import { getUploadErrorMessage, UPLOAD_ERROR_MESSAGES } from "../../lib/error-messages"
+import {
+  getUploadErrorMessage,
+  UPLOAD_ERROR_MESSAGES,
+} from "../../lib/error-messages"
 import axios from "axios"
 
 /**
@@ -94,9 +97,7 @@ export default function UploadPageClient() {
 
       // Validate duration (post-upload check)
       if (info.duration && info.duration > 60) {
-        setErrorMessage(
-          UPLOAD_ERROR_MESSAGES.DURATION_EXCEEDS_LIMIT,
-        )
+        setErrorMessage(UPLOAD_ERROR_MESSAGES.DURATION_EXCEEDS_LIMIT)
         setUploadStatus("error")
         return
       }
@@ -120,9 +121,7 @@ export default function UploadPageClient() {
       }
     } catch (error: any) {
       console.error("Upload error:", error)
-      setErrorMessage(
-        getUploadErrorMessage(error)
-      )
+      setErrorMessage(getUploadErrorMessage(error))
       setUploadStatus("error")
     } finally {
       setIsUploading(false)
@@ -138,7 +137,7 @@ export default function UploadPageClient() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <div className="max-w-2xl w-full mx-4">
+      <div className="max-w-2xl w-full mx-4 mt-6">
         <article className="bg-white rounded-lg shadow-lg p-8">
           <header className="text-center mb-8">
             <h1 className="text-3xl font-bold text-gray-900 mb-2">
@@ -166,7 +165,8 @@ export default function UploadPageClient() {
                 YouTube account not connected
               </p>
               <p className="text-yellow-700 text-sm mb-3">
-                Connect your YouTube account to upload videos and enable automatic publishing.
+                Connect your YouTube account to upload videos and enable
+                automatic publishing.
               </p>
               <form action="/api/auth/youtube" method="GET">
                 <button

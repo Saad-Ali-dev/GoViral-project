@@ -58,35 +58,35 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
           <Link
             href="/"
             onClick={onClose}
-            className="w-full bg-[#C7161C] text-white text-center font-semibold py-3 rounded-lg hover:bg-opacity-90 transition-opacity"
+            className="w-full bg-[#C7161C] hover:bg-[#C7161C]/90 text-white text-center font-semibold py-2 rounded hover:bg-opacity-90 transition-opacity"
           >
             Home
           </Link>
           <Link
             href="/videos"
             onClick={onClose}
-            className="w-full bg-[#C7161C] text-white text-center font-semibold py-3 rounded-lg hover:bg-opacity-90 transition-opacity"
+            className="w-full bg-[#C7161C] hover:bg-[#C7161C]/90 text-white text-center font-semibold py-2 rounded hover:bg-opacity-90 transition-opacity"
           >
             Videos
           </Link>
-          
+
           {/* Connect YouTube Button (only when signed in) */}
           <SignedIn>
             <ConnectYouTubeButton />
           </SignedIn>
-          
+
           <SignedOut>
             <Link
               href="/sign-in"
               onClick={onClose}
-              className="w-full bg-[#C7161C] text-white text-center font-semibold py-3 rounded-lg hover:bg-opacity-90 transition-opacity"
+              className="w-full bg-[#C7161C] hover:bg-[#C7161C]/90 text-white text-center font-semibold py-2 rounded hover:bg-opacity-90 transition-opacity"
             >
               Login
             </Link>
             <Link
               href="/sign-up"
               onClick={onClose}
-              className="w-full bg-[#C7161C] text-white text-center font-semibold py-3 rounded-lg hover:bg-opacity-90 transition-opacity"
+              className="w-full bg-[#C7161C] hover:bg-[#C7161C]/90 text-white text-center font-semibold py-2 rounded hover:bg-opacity-90 transition-opacity"
             >
               Sign Up
             </Link>
