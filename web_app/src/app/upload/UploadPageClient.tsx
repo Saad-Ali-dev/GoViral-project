@@ -118,6 +118,12 @@ export default function UploadPageClient() {
         console.log("Video metadata saved:", response.data)
         setUploadStatus("success")
         setUploadProgress(100)
+
+        // Redirect to processing page
+        const redirectUrl = response.data.redirectTo || "/processing"
+        setTimeout(() => {
+          router.push(redirectUrl)
+        }, 1500)
       }
     } catch (error: any) {
       console.error("Upload error:", error)

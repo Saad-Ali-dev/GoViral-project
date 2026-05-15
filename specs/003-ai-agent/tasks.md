@@ -12,14 +12,14 @@
 
 **Independent Test Criteria**: Python backend can start and respond to health check
 
-- [ ] T001 Create agent_backend/ directory structure per implementation plan
-- [ ] T002 Create agent_backend/requirements.txt with FastAPI, langchain-google-genai, requests, uvicorn
-- [ ] T003 Create agent_backend/.env.example with GEMINI_API_KEY placeholder
-- [ ] T004 [P] Create agent_backend/src/__init__.py
-- [ ] T005 [P] Create agent_backend/src/routes/__init__.py
-- [ ] T006 [P] Create agent_backend/src/services/__init__.py
-- [ ] T007 [P] Create agent_backend/src/utils/__init__.py
-- [ ] T008 Create agent_backend/main.py with FastAPI app initialization and health endpoint
+- [X] T001 Create agent_backend/ directory structure per implementation plan
+- [X] T002 Create agent_backend/requirements.txt with FastAPI, langchain-google-genai, requests, uvicorn
+- [X] T003 Create agent_backend/.env.example with GEMINI_API_KEY placeholder
+- [X] T004 [P] Create agent_backend/src/__init__.py
+- [X] T005 [P] Create agent_backend/src/routes/__init__.py
+- [X] T006 [P] Create agent_backend/src/services/__init__.py
+- [X] T007 [P] Create agent_backend/src/utils/__init__.py
+- [X] T008 Create agent_backend/main.py with FastAPI app initialization and health endpoint
 
 ## Phase 2: Foundational
 
@@ -27,10 +27,10 @@
 
 **Independent Test Criteria**: Utility modules can be imported and used without errors
 
-- [ ] T009 [P] Create agent_backend/src/utils/file_manager.py for temporary file handling
-- [ ] T010 [P] Create agent_backend/src/services/cloudinary_download.py with download function
-- [ ] T011 [P] Create agent_backend/src/services/gemini_upload.py with upload function
-- [ ] T012 Create agent_backend/src/routes/video_processing.py with POST /process-video endpoint
+- [X] T009 [P] Create agent_backend/src/utils/file_manager.py for temporary file handling
+- [X] T010 [P] Create agent_backend/src/services/cloudinary_download.py with download function
+- [X] T011 [P] Create agent_backend/src/services/gemini_upload.py with upload function
+- [X] T012 Create agent_backend/src/routes/video_processing.py with POST /process-video endpoint
 
 ## Phase 3: User Story 1 - View Processing Status
 
@@ -40,12 +40,12 @@
 
 **Dependencies**: Requires Phase 2 complete
 
-- [ ] T013 [US1] Create web_app/public/bot-animation.mp4 placeholder file
-- [ ] T014 [US1] Create web_app/src/app/processing/page.tsx with centered #212121 box
-- [ ] T015 [US1] Implement video tag with autoplay and loop for bot-animation.mp4 in src/app/processing/page.tsx
-- [ ] T016 [US1] Add generic status text "Processing your video..." display beneath animation in src/app/processing/page.tsx
-- [ ] T017 [US1] Ensure responsive design for mobile in src/app/processing/page.tsx
-- [ ] T018 [US1] Add video processing call from existing video upload flow to trigger backend
+- [X] T013 [US1] Create web_app/public/bot-animation.mp4 placeholder file
+- [X] T014 [US1] Create web_app/src/app/processing/page.tsx with centered #212121 box
+- [X] T015 [US1] Implement video tag with autoplay and loop for bot-animation.mp4 in src/app/processing/page.tsx
+- [X] T016 [US1] Add generic status text "Processing your video..." display beneath animation in src/app/processing/page.tsx
+- [X] T017 [US1] Ensure responsive design for mobile in src/app/processing/page.tsx
+- [X] T018 [US1] Add video processing call from existing video upload flow to trigger backend
 
 ## Phase 4: User Story 2 - Download Video from Cloudinary
 
@@ -55,10 +55,10 @@
 
 **Dependencies**: Requires Phase 3 (US1) for the trigger, Phase 2 for services
 
-- [ ] T019 [US2] Implement video download logic in src/services/cloudinary_download.py
-- [ ] T020 [US2] Add error handling for invalid/missing Cloudinary URLs in src/services/cloudinary_download.py
-- [ ] T021 [US2] Add streaming download for memory efficiency in src/services/cloudinary_download.py
-- [ ] T022 [US2] Integrate download service in src/routes/video_processing.py
+- [X] T019 [US2] Implement video download logic in src/services/cloudinary_download.py
+- [X] T020 [US2] Add error handling for invalid/missing Cloudinary URLs in src/services/cloudinary_download.py
+- [X] T021 [US2] Add streaming download for memory efficiency in src/services/cloudinary_download.py
+- [X] T022 [US2] Integrate download service in src/routes/video_processing.py
 
 ## Phase 5: User Story 3 - Upload Video to Gemini Files API
 
@@ -68,11 +68,11 @@
 
 **Dependencies**: Requires Phase 4 (US2) - download must complete before upload
 
-- [ ] T023 [US3] Implement video upload to Gemini Files API in src/services/gemini_upload.py
-- [ ] T024 [US3] Use google.genai.Client with files.upload() per research.md
-- [ ] T025 [US3] Handle Gemini API errors and rate limits in src/services/gemini_upload.py
-- [ ] T026 [US3] Integrate Gemini upload in src/routes/video_processing.py after download completes
-- [ ] T027 [US3] Return Gemini file reference in API response
+- [X] T023 [US3] Implement video upload to Gemini Files API in src/services/gemini_upload.py
+- [X] T024 [US3] Use google.genai.Client with files.upload() per research.md
+- [X] T025 [US3] Handle Gemini API errors and rate limits in src/services/gemini_upload.py
+- [X] T026 [US3] Integrate Gemini upload in src/routes/video_processing.py after download completes
+- [X] T027 [US3] Return Gemini file reference in API response
 
 ## Phase 6: User Story 4 - Clean Up Local Video File
 
@@ -94,10 +94,10 @@
 
 **Dependencies**: Requires all user stories complete
 
-- [ ] T031 [P] Add proper error responses in src/routes/video_processing.py for all failure cases
-- [ ] T032 [P] Add client-side redirect logic in Next.js after receiving processing-started response
-- [ ] T033 [P] Update video upload API to call Python backend after Cloudinary upload succeeds
-- [ ] T034 Ensure Railway deployment configuration is valid (uvicorn startup command)
+- [X] T031 [P] Add proper error responses in src/routes/video_processing.py for all failure cases
+- [X] T032 [P] Add client-side redirect logic in Next.js after receiving processing-started response
+- [X] T033 [P] Update video upload API to call Python backend after Cloudinary upload succeeds
+- [X] T034 Ensure Railway deployment configuration is valid (uvicorn startup command)
 
 ---
 
