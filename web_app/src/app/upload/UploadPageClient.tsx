@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { useUser } from "@clerk/nextjs"
 import { useRouter, useSearchParams } from "next/navigation"
 import { VideoUploadWidget } from "../../components/upload/VideoUploadWidget"
@@ -11,11 +11,6 @@ import {
 } from "../../lib/error-messages"
 import axios from "axios"
 
-/**
- * Client-side upload page component
- * Handles video upload flow with progress tracking, error handling,
- * and YouTube OAuth verification
- */
 export default function UploadPageClient() {
   const { isLoaded, isSignedIn } = useUser()
   const router = useRouter()
@@ -23,11 +18,12 @@ export default function UploadPageClient() {
   const [uploadProgress, setUploadProgress] = useState(0)
   const [isUploading, setIsUploading] = useState(false)
   const [uploadStatus, setUploadStatus] = useState<
-    "idle" | "uploading" | "success" | "error"
+    "idle" | "uploading" | "processing" | "success" | "error"
   >("idle")
   const [errorMessage, setErrorMessage] = useState("")
   const [hasYouTubeConnection, setHasYouTubeConnection] = useState(false)
   const [checkingYouTube, setCheckingYouTube] = useState(true)
+  const progressIntervalRef = useRef<NodeJS.Timeout | null>(null)
 
   // Check YouTube OAuth status on mount
   useEffect(() => {
@@ -51,6 +47,32 @@ export default function UploadPageClient() {
 
     checkYouTubeStatus()
   }, [isSignedIn])
+
+  // Cleanup interval on unmount
+  useEffect(() => {
+    return () => {
+      if (progressIntervalRef.current)
+        clearInterval(progressIntervalRef.current)
+    }
+  }, [])
+
+  const startProgressSimulation = () => {
+    setUploadProgress(15)
+    progressIntervalRef.current = setInterval(() => {
+      setUploadProgress((prev) => {
+        if (prev >= 92) return prev
+        const remaining = 92 - prev
+        return Math.min(prev + remaining * 0.08 + 0.5, 92)
+      })
+    }, 800)
+  }
+
+  const stopProgressSimulation = () => {
+    if (progressIntervalRef.current) {
+      clearInterval(progressIntervalRef.current)
+      progressIntervalRef.current = null
+    }
+  }
 
   // Handle sign-in requirement
   if (!isLoaded || !isSignedIn) {
@@ -95,14 +117,16 @@ export default function UploadPageClient() {
         size: info.bytes,
       })
 
-      // Validate duration (post-upload check)
       if (info.duration && info.duration > 60) {
         setErrorMessage(UPLOAD_ERROR_MESSAGES.DURATION_EXCEEDS_LIMIT)
         setUploadStatus("error")
         return
       }
 
-      // Store metadata in backend
+      setIsUploading(false)
+      setUploadStatus("processing")
+      startProgressSimulation()
+
       const response = await axios.post("/api/videos", {
         cloudinaryUrl: info.secure_url,
         publicId: info.public_id,
@@ -115,12 +139,17 @@ export default function UploadPageClient() {
       })
 
       if (response.status === 201) {
-        console.log("Video metadata saved:", response.data)
-        setUploadStatus("success")
+        stopProgressSimulation()
         setUploadProgress(100)
+        setUploadStatus("success")
+
+        const redirectUrl = response.data.redirectTo || "/processing"
+        setTimeout(() => {
+          router.push(redirectUrl)
+        }, 1000)
       }
     } catch (error: any) {
-      console.error("Upload error:", error)
+      stopProgressSimulation()
       setErrorMessage(getUploadErrorMessage(error))
       setUploadStatus("error")
     } finally {
@@ -196,25 +225,37 @@ export default function UploadPageClient() {
               }}
               onUploadSuccess={handleUploadSuccess}
               onUploadError={handleUploadError}
-              disabled={isUploading || checkingYouTube || !hasYouTubeConnection}
+              disabled={
+                isUploading ||
+                uploadStatus === "processing" ||
+                checkingYouTube ||
+                !hasYouTubeConnection
+              }
             />
           </div>
 
           {/* Progress Bar */}
-          <UploadProgress progress={uploadProgress} isUploading={isUploading} />
+          <UploadProgress
+            progress={uploadProgress}
+            isUploading={isUploading}
+            isProcessing={uploadStatus === "processing"}
+          />
+
+          {/* Processing Message */}
+          {uploadStatus === "processing" && (
+            <div className="mt-6 p-4 bg-indigo-50 border border-indigo-200 rounded-lg text-center">
+              <p className="text-indigo-800 font-semibold">
+                Uploading your video to AI for processing...
+              </p>
+            </div>
+          )}
 
           {/* Success Message */}
           {uploadStatus === "success" && (
             <div className="mt-6 p-4 bg-green-50 border border-green-200 rounded-lg text-center">
-              <p className="text-green-800 font-semibold mb-2">
-                Video uploaded successfully! AI processing has started.
+              <p className="text-green-800 font-semibold">
+                Upload to AI complete! Redirecting...
               </p>
-              <button
-                onClick={() => router.push("/")}
-                className="mt-2 px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium"
-              >
-                Go to Dashboard
-              </button>
             </div>
           )}
 

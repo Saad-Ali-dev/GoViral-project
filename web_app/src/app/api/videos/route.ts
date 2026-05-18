@@ -51,7 +51,7 @@ export async function POST(request: NextRequest) {
     // Connect to database
     await dbConnect()
 
-    // Create video document
+    // Create video document with "processing" status
     const video = await Video.create({
       userId,
       cloudinaryUrl,
@@ -60,7 +60,7 @@ export async function POST(request: NextRequest) {
       duration,
       originalFilename,
       thumbnailUrl,
-      status: "completed",
+      status: "processing",
       metadata: {
         resourceType: "video",
         originalFilename,
@@ -70,28 +70,38 @@ export async function POST(request: NextRequest) {
       },
     })
 
-    // Notify agent service (dummy URL for now)
+    // Call agent service to process video
     const agentServiceUrl =
-      process.env.AGENT_SERVICE_URL ||
-      "http://localhost:8000/api/dummy-agent"
+      process.env.AGENT_SERVICE_URL || "http://localhost:8000"
 
     try {
-      await axios.post(agentServiceUrl, {
-        videoId: video._id.toString(),
-        clerkId: video.userId,
-        cloudinaryUrl: video.cloudinaryUrl,
-        duration: video.duration,
-        size: video.size,
-      })
+      const response = await axios.post(
+        `${agentServiceUrl}/api/videos/process`,
+        {
+          cloudinary_url: cloudinaryUrl,
+          video_id: video._id.toString(),
+          user_id: userId,
+          public_id: publicId,
+        },
+        { timeout: 30000 }
+      )
+
+      console.log("Agent service response:", response.data)
 
       video.agentServiceNotified = true
       await video.save()
-    } catch (agentError) {
-      console.error("Agent service notification failed:", agentError)
+    } catch (agentError: any) {
+      console.error("Agent service notification failed:", agentError?.message || agentError)
       // Don't fail the upload - agent service is async
     }
 
-    return NextResponse.json(video, { status: 201 })
+    return NextResponse.json(
+      {
+        ...video.toObject(),
+        redirectTo: `/processing?video_id=${video._id}`,
+      },
+      { status: 201 }
+    )
   } catch (error) {
     console.error("Video metadata storage error:", error)
     return NextResponse.json(
