@@ -29,12 +29,9 @@ export default function ProcessingClient() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-white px-4">
-      <div
-        className="w-full max-w-md mx-auto p-8 rounded-lg"
-        style={{ backgroundColor: "#212121" }}
-      >
+      <div className="w-full max-w-5xl mx-auto p-8 bg-[#212121] rounded-[20px]">
         <div className="flex flex-col items-center">
-          <div className="relative w-32 h-32 mb-6">
+          <div className="relative w-64 h-64 ">
             <video
               autoPlay
               loop
@@ -43,7 +40,6 @@ export default function ProcessingClient() {
               className="w-full h-full object-contain"
               poster="/logo.png"
             >
-              <source src="/bot-animation.mov" type="video/quicktime" />
               <source src="/bot-animation.mp4" type="video/mp4" />
               <Image
                 src="/logo.png"
@@ -55,15 +51,15 @@ export default function ProcessingClient() {
           </div>
 
           <h1
-            className="text-2xl font-semibold mb-2 text-center"
+            className="text-2xl text-white font-semibold mb-2 text-center"
             style={{ fontFamily: "var(--font-poppins)" }}
           >
-            GoViral AI
+            GoViral Agent
           </h1>
 
           <p className="text-white/80 text-center mb-4">{statusMessage}</p>
 
-          <div className="w-full bg-white/10 rounded-full h-2 mb-4">
+          <div className="w-[50%] bg-white/10 rounded-full h-2 mb-4">
             <div
               className="bg-red-500 h-2 rounded-full animate-pulse"
               style={{ width: "60%" }}
