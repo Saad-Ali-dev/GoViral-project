@@ -1,4 +1,4 @@
-﻿# Project / Repo Overview
+# Project / Repo Overview
 
 **Purpose**: GoViral app automates SEO preparation and publishing for short-form videos on Youtube. It takes an uploaded video, analyzes video and audio, produces SEO-ready metadata (titles, short/long descriptions, tags, hashtags, keywords), runs safety checks, and delivers a human-reviewable package that can be published to YouTube on approval.
 
@@ -57,6 +57,8 @@ The folder for this part of the codebase is `/agent_backend/` in the root direct
 # Very Important Notes
 
 - This is my portfolio project, and i am planning to deploy the Next.js app on (Vercel free tier) and python agent service/backend on (Railway free tier -- 1 vCPU + 0.5 GB RAM + 0.5 GB Volume storage). So, please keep that in mind before doing anything and while making changes.
+
+- Every API response should complete within 10 seconds to avoid timeouts on vercel serverless functions and the Railway free tier. If any AI processing is expected to take longer, implement a polling mechanism or asynchronous processing with status updates or first send a generic response and send actual results afterwards or make an api in next.js that the python server directly calls to send the actual results.
 
 - Always follow the rules in `.specify/memory/constitution.md` and when making decisions or taking actions.
 
