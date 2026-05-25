@@ -38,18 +38,6 @@ export const UPLOAD_ERROR_MESSAGES = {
   METADATA_SAVE_FAILED:
     "Failed to save video metadata. Please try again.",
   
-  // OAuth errors
-  YOUTUBE_OAUTH_REQUIRED:
-    "YouTube authorization required to upload videos.",
-  
-  YOUTUBE_OAUTH_DENIED:
-    "YouTube authorization was denied. Please connect your YouTube account to upload.",
-  
-  YOUTUBE_OAUTH_FAILED:
-    "Unable to complete YouTube authorization. Please try again.",
-  
-  YOUTUBE_TOKEN_EXPIRED:
-    "YouTube connection expired. Please reconnect your YouTube account.",
 } as const
 
 /**
@@ -86,16 +74,6 @@ export function getUploadErrorMessage(error: string | Error | unknown): string {
     if (message.includes("unauthorized") || message.includes("sign in")) {
       return UPLOAD_ERROR_MESSAGES.UNAUTHORIZED
     }
-    if (message.includes("oauth") || message.includes("authorization")) {
-      if (message.includes("denied")) {
-        return UPLOAD_ERROR_MESSAGES.YOUTUBE_OAUTH_DENIED
-      }
-      if (message.includes("expired")) {
-        return UPLOAD_ERROR_MESSAGES.YOUTUBE_TOKEN_EXPIRED
-      }
-      return UPLOAD_ERROR_MESSAGES.YOUTUBE_OAUTH_REQUIRED
-    }
-    
     // Default to server error or the error message itself
     return error.message || UPLOAD_ERROR_MESSAGES.SERVER_ERROR
   }

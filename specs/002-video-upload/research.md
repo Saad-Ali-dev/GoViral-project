@@ -5,6 +5,8 @@
 **Updated**: 2026-03-11
 **Status**: Complete
 
+⚠️ **YOUTUBE FEATURES REMOVED** — YouTube OAuth, channel access, YouTube upload, YouTube connection checks, and YouTube Data API integration have been permanently removed from this project. This file is preserved for historical reference only.
+
 This document consolidates all research findings for the video upload feature with YouTube OAuth and Cloudinary integration.
 
 ---
@@ -60,6 +62,7 @@ import { CldUploadWidget } from 'next-cloudinary';
 
 ---
 
+REMOVED: YouTube feature
 ## Decision 2: YouTube OAuth 2.0 Authorization Flow
 
 ### What was chosen
@@ -79,6 +82,7 @@ Google OAuth 2.0 authorization code flow with offline access using `google-auth-
 3. **Service account authentication**: Cannot impersonate users for YouTube uploads. Rejected.
 4. **google-api-javascript-client**: Browser-focused, less suitable for Next.js API routes. Rejected.
 
+REMOVED: YouTube feature
 ### Required scopes
 - `https://www.googleapis.com/auth/youtube.upload` - Upload videos to YouTube
 - `https://www.googleapis.com/auth/youtube` - Manage YouTube account data
@@ -194,6 +198,7 @@ const [isUploading, setIsUploading] = useState(false);
 
 ## Decision 5: MongoDB Schema Design
 
+REMOVED: YouTube feature
 ### What was chosen
 - **User collection**: Extended with embedded YouTube credentials (encrypted)
 - **VideoUpload collection**: Separate collection with Clerk ID reference to User
@@ -276,6 +281,7 @@ try {
 ## Decision 7: Environment Variables Configuration
 
 ### What was chosen
+REMOVED: YouTube feature
 Use existing environment variables as specified by user:
 - `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME`
 - `NEXT_PUBLIC_GOOGLE_YOUTUBE_CLIENT_ID`
@@ -300,6 +306,7 @@ Use existing environment variables as specified by user:
 | Component | Technology | Rationale |
 |-----------|-----------|-----------|
 | Upload Widget | next-cloudinary (CldUploadWidget) | React integration, progress tracking, signed uploads |
+REMOVED: YouTube feature
 | OAuth Library | google-auth-library | Official Google library, refresh token support |
 | Database | MongoDB (mongoose) | Existing stack, flexible schema for credentials |
 | Storage | Cloudinary | User-configured, video optimization, CDN delivery |
@@ -384,71 +391,10 @@ export default function UploadPage() {
 
 ---
 
+REMOVED: YouTube feature
 ## Decision 10: Connect YouTube Button Implementation
 
-### What was chosen
-Implement a dedicated 'Connect YouTube' button in the Navbar/Sidebar that triggers YouTube OAuth flow independently of the upload process.
-
-### Why chosen
-- **User Experience**: Allows users to connect YouTube account proactively without interrupting upload flow
-- **Spec Requirement**: FR-017 mandates a 'Connect YouTube' button in Navbar/Sidebar
-- **Flexibility**: Users can set up YouTube connection at their convenience
-- **Error Prevention**: Reduces upload interruptions due to missing OAuth credentials
-
-### Button Visibility Logic
-- **Show 'Connect YouTube'**: When user has no youtubeAccessToken OR token is expired
-- **Show 'Connected' indicator**: When user has valid (non-expired) youtubeAccessToken
-- **Placement**: Navbar or Sidebar for easy access and discoverability
-
-### Alternatives considered
-1. **Upload-only OAuth trigger**: Rejected - interrupts upload flow, poor UX
-2. **Settings page only**: Rejected - less discoverable, adds friction
-3. **Automatic OAuth on signup**: Rejected - too aggressive, may scare users
-
-### Implementation reference
-```tsx
-// components/layout/ConnectYouTubeButton.tsx
-import { currentUser } from '@clerk/nextjs/server'
-import { User } from '@/models/User'
-
-async function ConnectYouTubeButton() {
-  const user = await currentUser()
-  
-  if (!user) {
-    return null // Don't show for unauthenticated users
-  }
-
-  // Check YouTube connection status
-  const dbUser = await User.findOne({ clerkId: user.id })
-  const hasValidConnection = 
-    dbUser?.youtubeAccessToken && 
-    dbUser.youtubeTokenExpiry && 
-    new Date(dbUser.youtubeTokenExpiry) > new Date()
-
-  if (hasValidConnection) {
-    return (
-      <div className="flex items-center gap-2 text-green-600">
-        <YouTubeIcon className="w-5 h-5" />
-        <span>YouTube Connected</span>
-      </div>
-    )
-  }
-
-  return (
-    <form action="/api/auth/youtube">
-      <button 
-        type="submit"
-        className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
-      >
-        <YouTubeIcon className="w-5 h-5" />
-        Connect YouTube
-      </button>
-    </form>
-  )
-}
-
-export default ConnectYouTubeButton
-```
+---
 
 ---
 

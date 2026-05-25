@@ -88,8 +88,6 @@ export async function POST(request: NextRequest) {
 
       console.log("Agent service response:", response.data)
 
-      video.agentServiceNotified = true
-      await video.save()
     } catch (agentError: any) {
       console.error("Agent service notification failed:", agentError?.message || agentError)
       // Don't fail the upload - agent service is async

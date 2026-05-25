@@ -24,7 +24,7 @@ export default function HeroSection() {
 
         {/* Subtitle */}
         <p className="font-inter text-white text-lg md:text-2xl flex items-center justify-center gap-2">
-          Youtube Shorts SEO Agent
+          AI-Powered Short-Form SEO Agent
           {/* <span className="text-2xl">🙂</span> */}
           <span>
             <Image

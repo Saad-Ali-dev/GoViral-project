@@ -1,6 +1,6 @@
 import {
   FaMagnifyingGlass,
-  FaYoutube,
+  FaRocket,
   FaHourglassHalf,
   FaCloudArrowUp,
 } from "react-icons/fa6"
@@ -14,8 +14,8 @@ const features = [
   },
   {
     id: 2,
-    icon: FaYoutube,
-    heading: "Grow on Youtube",
+    icon: FaRocket,
+    heading: "Grow Your Reach",
     text: "Increase your chances of getting viral, by reaching the right audience according to your niche and get more views and subscribers.",
   },
   {
@@ -27,8 +27,8 @@ const features = [
   {
     id: 4,
     icon: FaCloudArrowUp,
-    heading: "Direct Upload",
-    text: "Upload your shorts directly to your Youtube channel after AI review.",
+    heading: "AI-Powered Analysis",
+    text: "Upload your short-form videos and let AI generate optimized SEO metadata for maximum discoverability.",
   },
 ]
 

@@ -5,13 +5,16 @@
 **Updated**: 2026-03-11
 **Version**: 1.1.0
 
+⚠️ **YOUTUBE FEATURES REMOVED** — YouTube OAuth, channel access, YouTube upload, YouTube connection checks, and YouTube Data API integration have been permanently removed from this project. This file is preserved for historical reference only.
+
 This document defines the data entities, relationships, validation rules, and state transitions for the video upload feature.
 
 ---
 
 ## Entity 1: User (Extended)
 
-**Purpose**: Represents an authenticated user with YouTube OAuth credentials for video publishing.
+**Purpose**: Represents an authenticated user.
+REMOVED: YouTube feature - YouTube OAuth credentials removed from User entity
 
 **Collection**: `users` (existing, extended with YouTube credentials)
 
@@ -22,10 +25,11 @@ This document defines the data entities, relationships, validation rules, and st
 | `_id`                 | ObjectId | Yes      | MongoDB primary key                                                |
 | `clerkId`             | String   | Yes      | Unique user identifier from Clerk authentication (indexed, unique) |
 | `email`               | String   | Yes      | User email address (indexed, unique)                               |
-| `youtubeAccessToken`  | String   | No       | Encrypted YouTube OAuth access token                               |
-| `youtubeRefreshToken` | String   | No       | Encrypted YouTube OAuth refresh token                              |
-| `youtubeTokenExpiry`  | Date     | No       | Access token expiration timestamp                                  |
-| `channelId`           | String   | No       | YouTube channel identifier (populated after first upload)          |
+REMOVED: YouTube feature
+| `youtubeAccessToken`  | String   | No       | Encrypted YouTube OAuth access token |
+| `youtubeRefreshToken` | String   | No       | Encrypted YouTube OAuth refresh token |
+| `youtubeTokenExpiry`  | Date     | No       | Access token expiration timestamp |
+| `channelId`           | String   | No       | YouTube channel identifier |
 | `createdAt`           | Date     | Yes      | Document creation timestamp                                        |
 | `updatedAt`           | Date     | Yes      | Last update timestamp                                              |
 
@@ -43,10 +47,9 @@ This document defines the data entities, relationships, validation rules, and st
 ### Validation Rules
 
 1. **clerkId**: Must be unique, non-empty string from Clerk authentication
-2. **youtubeAccessToken**: Stored encrypted when present
-3. **youtubeRefreshToken**: Stored encrypted when present
-4. **youtubeTokenExpiry**: Must be a valid Date when credentials exist
+REMOVED: YouTube feature - youtubeAccessToken, youtubeRefreshToken, youtubeTokenExpiry fields removed
 
+REMOVED: YouTube feature
 ### Encryption Requirements
 
 - YouTube credentials SHOULD be encrypted at rest using a secure encryption algorithm (e.g., AES-256-GCM)
@@ -77,8 +80,9 @@ This document defines the data entities, relationships, validation rules, and st
 | `thumbnailUrl`     | String     | No       | -         | Thumbnail image URL from Cloudinary                    |
 | `aiResponse`       | AIResponse | No       | -         | AI-generated metadata (title, description, tags, etc.) |
 | `metadata`         | Metadata   | No       | -         | Original video metadata (format, dimensions, tags, etc.) |
-| `youtubeUrl`       | String     | No       | -         | YouTube video URL after publishing                     |
-| `youtubeVideoId`   | String     | No       | -         | YouTube video ID after publishing                      |
+REMOVED: YouTube feature
+| `youtubeUrl`       | String     | No       | -         | YouTube video URL after publishing |
+| `youtubeVideoId`   | String     | No       | -         | YouTube video ID after publishing |
 | `createdAt`        | Date       | Yes      | -         | Upload initiation timestamp                            |
 | `updatedAt`        | Date       | Yes      | -         | Last update timestamp                                  |
 
@@ -100,7 +104,8 @@ This document defines the data entities, relationships, validation rules, and st
 | `title`       | String   | No       | AI-generated video title           |
 | `description` | String   | No       | AI-generated video description     |
 | `tags`        | String[] | No       | AI-generated tags/keywords         |
-| `categoryId`  | Number   | No       | YouTube video category ID          |
+REMOVED: YouTube feature - categoryId removed
+| `categoryId`  | Number   | No       | YouTube video category ID |
 | `viralScore`  | Number   | No       | AI-predicted viral potential score |
 
 ### Indexes
@@ -138,12 +143,11 @@ pending → processing → completed → published
 | `pending`    | `processing` | Upload starts, security checks pass | File type, size validated                    |
 | `processing` | `completed`  | Upload completes, metadata stored   | Duration ≤ 60s, all metadata present         |
 | `processing` | `failed`     | Upload fails or validation fails    | Error message required                       |
-| `completed`  | `published`  | Video published to YouTube          | YouTube credentials valid, API call succeeds |
+REMOVED: YouTube feature - published state removed
 | `completed`  | `failed`     | Post-upload validation fails        | Duration > 60s or other error                |
 
 **Invalid Transitions**:
 
-- `published` → any (terminal state)
 - `failed` → any (terminal state, user must re-upload)
 - `pending` → `completed` (must go through `processing`)
 - `pending` → `published` (must complete upload first)
@@ -236,21 +240,10 @@ const videoSchema = new Schema({
 
 ## Sample Documents
 
+REMOVED: YouTube feature
 ### User Document (with YouTube Credentials)
 
-```json
-{
-  "_id": "ObjectId('507f1f77bcf86cd799439011')",
-  "clerkId": "user_2abc123xyz",
-  "email": "creator@example.com",
-  "youtubeAccessToken": "ya29.a0AfH6SMBx...encrypted...xyz123",
-  "youtubeRefreshToken": "1//0gABC123...encrypted...xyz789",
-  "youtubeTokenExpiry": "ISODate('2026-03-10T15:30:00.000Z')",
-  "channelId": "UCxyz123abc",
-  "createdAt": "ISODate('2026-01-15T10:00:00.000Z')",
-  "updatedAt": "ISODate('2026-03-10T14:30:00.000Z')"
-}
-```
+YouTube credential fields have been removed from the User document.
 
 ### Video Document (Completed)
 
@@ -277,8 +270,8 @@ const videoSchema = new Schema({
     "title": "Amazing Short Video!",
     "description": "Check out this amazing short-form video optimized for YouTube",
     "tags": ["shorts", "viral", "trending"],
-    "categoryId": 24,
     "viralScore": 85
+    REMOVED: YouTube feature - categoryId removed
   },
   "createdAt": "ISODate('2026-03-10T14:00:00.000Z')",
   "updatedAt": "ISODate('2026-03-10T14:05:00.000Z')"
@@ -334,19 +327,9 @@ const videoSchema = new Schema({
    Video.find({ status: "completed", aiResponse: { $exists: false } });
    ```
 
-4. **Check if user has YouTube credentials**:
-
-   ```typescript
-   User.findOne({ clerkId }, { youtubeAccessToken: 1, youtubeTokenExpiry: 1 });
-   ```
-
-5. **Get expired tokens for refresh**:
-   ```typescript
-   User.find({
-     youtubeTokenExpiry: { $lt: new Date() },
-     youtubeRefreshToken: { $exists: true },
-   });
-   ```
+REMOVED: YouTube feature
+4. **Check if user has YouTube credentials**: Removed
+5. **Get expired tokens for refresh**: Removed
 
 ---
 

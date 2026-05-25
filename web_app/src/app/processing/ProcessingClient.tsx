@@ -17,7 +17,6 @@ interface PipelineStep {
 const initialSteps: PipelineStep[] = [
   { id: 1, name: "Security Check", status: "active" },
   { id: 2, name: "SEO Generation", status: "pending" },
-  { id: 3, name: "YouTube Upload", status: "pending" },
 ]
 
 const STEP_DURATION = 5000

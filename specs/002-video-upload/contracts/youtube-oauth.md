@@ -1,3 +1,5 @@
+⚠️ **YOUTUBE FEATURES REMOVED** — YouTube OAuth, channel access, YouTube upload, YouTube connection checks, and YouTube Data API integration have been permanently removed from this project. This file is preserved for historical reference only.
+
 # YouTube OAuth 2.0 Flow Contract
 
 **Feature**: 002-video-upload  

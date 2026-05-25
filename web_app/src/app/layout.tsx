@@ -7,7 +7,7 @@ import { ClerkProvider } from "@clerk/nextjs"
 
 export const metadata: Metadata = {
   title: "GoViral",
-  description: "Grow on Youtube with AI",
+  description: "AI-Powered SEO for Short-Form Videos",
 }
 
 export default function RootLayout({

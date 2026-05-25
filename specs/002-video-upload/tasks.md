@@ -1,6 +1,8 @@
 # Tasks: Video Upload Feature
 
 **Input**: Design documents from `/specs/002-video-upload/`
+⚠️ **YOUTUBE FEATURES REMOVED** — YouTube OAuth, channel access, YouTube upload, YouTube connection checks, and YouTube Data API integration have been permanently removed from this project. This file is preserved for historical reference only.
+
 **Prerequisites**: plan.md (required), spec.md (required for user stories), research.md, data-model.md, contracts/
 
 **Tests (Constitution Rule 6)**: This project explicitly EXCLUDES all tests—no unit, integration, or E2E tests are permitted under any circumstances. All verification must be done through manual testing or other methods. DO NOT include any test tasks in task lists.
@@ -24,7 +26,9 @@
 
 **Purpose**: Project initialization and basic structure
 
-- [ ] T001 Install next-cloudinary and google-auth-library dependencies in web_app/
+REMOVED: YouTube feature
+- [ ] T001 Install next-cloudinary and google-auth-library dependencies in web_app/ (google-auth-library no longer needed)
+REMOVED: YouTube feature
 - [ ] T002 [P] Verify environment variables in web_app/.env.local (Cloudinary, YouTube OAuth, MongoDB)
 - [ ] T003 [P] Review existing project structure and Clerk authentication setup
 
@@ -37,6 +41,7 @@
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
 - [ ] T004 [P] Create Cloudinary configuration utility in web_app/src/lib/cloudinary.ts
+REMOVED: YouTube feature
 - [ ] T005 [P] Create YouTube OAuth utilities in web_app/src/lib/youtube-oauth.ts (encrypt/decrypt, token validation)
 - [ ] T006 [P] Extend User model with YouTube credentials in web_app/src/models/User.ts
 - [ ] T007 [P] Create VideoUpload model in web_app/src/models/Video.ts
@@ -68,38 +73,17 @@
 
 ---
 
+REMOVED: YouTube feature
 ## Phase 4: User Story 1.5 - YouTube OAuth Verification during Upload (Priority: P1)
 
-**Goal**: Automatically verify YouTube OAuth credentials when user initiates upload and trigger OAuth flow if credentials are missing or expired.
-
-**Independent Test**: Can be fully tested by clearing YouTube credentials from a user's document and initiating an upload, verifying the OAuth flow triggers and credentials are stored upon completion.
-
-### Implementation for User Story 1.5
-
-- [ ] T018 [P] [US1.5] Create YouTube OAuth initiation API route in web_app/src/app/api/auth/youtube/route.ts
-- [ ] T019 [P] [US1.5] Create YouTube OAuth callback API route in web_app/src/app/api/auth/youtube/callback/route.ts
-- [ ] T020 [US1.5] Add YouTube credential check logic to upload flow in web_app/src/app/upload/page.tsx
-- [ ] T021 [US1.5] Implement automatic token refresh logic in web_app/src/lib/youtube-oauth.ts
-- [ ] T022 [US1.5] Add OAuth error handling and user messaging for denied/failed authorization
-
-**Checkpoint**: At this point, User Story 1.5 should be fully functional - users without YouTube credentials are automatically redirected to OAuth flow before upload
+This entire user story has been removed. No OAuth verification occurs during upload.
 
 ---
 
+REMOVED: YouTube feature
 ## Phase 5: User Story 1.6 - Dedicated YouTube Connection (Priority: P2)
 
-**Goal**: Provide a dedicated 'Connect YouTube' button in Navbar/Sidebar for users to proactively connect their YouTube account without starting an upload.
-
-**Independent Test**: Can be tested by a signed-in user clicking the 'Connect YouTube' button and completing the OAuth flow, then verifying the credentials are stored and button state changes.
-
-### Implementation for User Story 1.6
-
-- [ ] T023 [P] [US1.6] Create YouTube connection status check API route in web_app/src/app/api/user/youtube-status/route.ts
-- [ ] T024 [P] [US1.6] Create ConnectYouTubeButton component in web_app/src/components/layout/ConnectYouTubeButton.tsx
-- [ ] T025 [US1.6] Integrate ConnectYouTubeButton into Navbar/Sidebar in web_app/src/components/layout/Navbar.tsx (or equivalent layout component)
-- [ ] T026 [US1.6] Add conditional rendering logic for connected/disconnected states
-
-**Checkpoint**: At this point, User Story 1.6 should be fully functional - users can connect YouTube account independently from upload flow
+This entire user story has been removed. No dedicated YouTube connection UI exists in the project.
 
 ---
 
@@ -170,8 +154,9 @@
 ### User Story Dependencies
 
 - **User Story 1 (P1)**: Can start after Foundational (Phase 2) - No dependencies on other stories
-- **User Story 1.5 (P1)**: Can start after Foundational (Phase 2) - Independent but enhances US1 flow
-- **User Story 1.6 (P2)**: Can start after Foundational (Phase 2) - Independent of upload flow
+REMOVED: YouTube feature
+- **User Story 1.5 (P1)**: Removed
+- **User Story 1.6 (P2)**: Removed
 - **User Story 2 (P1)**: Can start after US1 basic implementation - Integrates with all upload tasks
 - **User Story 3 (P2)**: Can start after US1 basic implementation - Enhances progress/completion UI
 
@@ -182,13 +167,14 @@
 - Core implementation before error handling
 - Core implementation before UI polish
 
+REMOVED: YouTube feature - User Stories 1.5 and 1.6 are removed entirely
+
 ### Parallel Opportunities
 
 - **Phase 1 (Setup)**: T002, T003 can run in parallel with T001
 - **Phase 2 (Foundational)**: T004, T005, T006, T007, T008 can ALL run in parallel (different files)
 - **Phase 3 (US1)**: T009, T010, T011 can run in parallel; T012, T013 can run in parallel
-- **Phase 4 (US1.5)**: T018, T019 can run in parallel
-- **Phase 5 (US1.6)**: T023, T024 can run in parallel
+REMOVED: YouTube feature - Phases 4 and 5 (US1.5 and US1.6) are removed
 - **Phase 6 (US2)**: T027 can run in parallel with other US2 tasks
 - **Phase 7 (US3)**: T033 can run in parallel with other US3 tasks
 - **Phase 8 (Polish)**: ALL tasks can run in parallel (different concerns)
@@ -200,11 +186,10 @@
 ```bash
 # Launch all foundational tasks together (different files, no dependencies):
 Task: "Create Cloudinary configuration utility in web_app/src/lib/cloudinary.ts"
-Task: "Create YouTube OAuth utilities in web_app/src/lib/youtube-oauth.ts"
-Task: "Extend User model with YouTube credentials in web_app/src/models/User.ts"
 Task: "Create VideoUpload model in web_app/src/models/Video.ts"
 Task: "Verify MongoDB connection utility in web_app/src/lib/db.ts"
 ```
+REMOVED: YouTube feature - youtube-oauth.ts and User model YouTube credential tasks removed
 
 ---
 
@@ -237,8 +222,8 @@ Task: "Create VideoUploadWidget component in web_app/src/components/upload/Video
 
 1. Complete Setup + Foundational → Foundation ready
 2. Add User Story 1 (basic upload) → Test independently → Deploy/Demo (MVP!)
-3. Add User Story 1.5 (OAuth verification) → Test independently → Deploy/Demo
-4. Add User Story 1.6 (Connect YouTube button) → Test independently → Deploy/Demo
+3. REMOVED: YouTube feature - User Story 1.5 (OAuth verification)
+4. REMOVED: YouTube feature - User Story 1.6 (Connect YouTube button)
 5. Add User Story 2 (error handling) → Test independently → Deploy/Demo
 6. Add User Story 3 (progress/completion UI polish) → Test independently → Deploy/Demo
 7. Complete Phase 8 (Polish) → Final validation
@@ -250,9 +235,8 @@ With multiple developers:
 1. Team completes Setup + Foundational together
 2. Once Foundational is done:
    - Developer A: User Story 1 (API routes + basic components)
-   - Developer B: User Story 1.5 (OAuth routes + integration)
-   - Developer C: User Story 1.6 (Connect button + status API)
-3. After US1/1.5/1.6 complete:
+   REMOVED: YouTube feature - User Stories 1.5 and 1.6 removed
+3. After US1 complete:
    - Developer A: User Story 2 (error handling)
    - Developer B: User Story 3 (progress/completion UI)
 4. Team completes Phase 8 (Polish) together
@@ -266,8 +250,8 @@ With multiple developers:
 | Phase 1 | Setup | 3 tasks |
 | Phase 2 | Foundational | 5 tasks |
 | Phase 3 | User Story 1 (Basic Upload) | 9 tasks |
-| Phase 4 | User Story 1.5 (OAuth Verification) | 5 tasks |
-| Phase 5 | User Story 1.6 (Connect YouTube Button) | 4 tasks |
+| Phase 4 | REMOVED: YouTube feature - User Story 1.5 (OAuth Verification) | 0 tasks |
+| Phase 5 | REMOVED: YouTube feature - User Story 1.6 (Connect YouTube Button) | 0 tasks |
 | Phase 6 | User Story 2 (Error Handling) | 6 tasks |
 | Phase 7 | User Story 3 (Progress & Completion) | 6 tasks |
 | Phase 8 | Polish & Cross-Cutting | 8 tasks |

@@ -2,13 +2,13 @@ import type { Metadata } from "next"
 import ProcessingClient from "./ProcessingClient"
 
 export const metadata: Metadata = {
-  title: "Processing Video - GoViral | AI-Powered YouTube SEO",
+  title: "Processing Video - GoViral | AI-Powered SEO",
   description:
-    "Your video is being processed by GoViral's AI. We're generating optimized metadata for your YouTube short.",
+    "Your video is being processed by GoViral's AI. We're generating optimized metadata for your short-form video.",
   keywords: [
     "video processing",
     "AI SEO",
-    "YouTube optimization",
+    "short-form video",
     "processing status",
   ],
   openGraph: {

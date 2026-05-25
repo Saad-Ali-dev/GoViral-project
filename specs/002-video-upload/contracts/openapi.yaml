@@ -1,3 +1,5 @@
+⚠️ **YOUTUBE FEATURES REMOVED** — YouTube OAuth, channel access, YouTube upload, YouTube connection checks, and YouTube Data API integration have been permanently removed from this project. This file is preserved for historical reference only.
+
 # API Contracts: Video Upload Feature
 
 **Feature**: 002-video-upload
@@ -15,7 +17,8 @@ This document defines the API contracts for the video upload feature, including 
 openapi: 3.0.3
 info:
   title: GoViral Video Upload API
-  description: API for video upload, YouTube OAuth, and metadata management
+  description: API for video upload and metadata management
+REMOVED: YouTube feature - YouTube OAuth removed
   version: 1.1.0
   contact:
     name: GoViral Team
@@ -27,8 +30,7 @@ servers:
     description: Production server
 
 tags:
-  - name: YouTube OAuth
-    description: YouTube OAuth 2.0 authentication endpoints
+  REMOVED: YouTube feature - YouTube OAuth tag and endpoints removed
   - name: Cloudinary
     description: Cloudinary upload signing endpoints
   - name: Videos
@@ -37,79 +39,7 @@ tags:
     description: User profile and YouTube connection status endpoints
 
 paths:
-  /auth/youtube:
-    get:
-      tags:
-        - YouTube OAuth
-      summary: Initiate YouTube OAuth flow
-      description: |
-        Redirects user to Google OAuth consent screen with required YouTube scopes.
-        Must be called when user initiates upload and has no valid YouTube credentials.
-      operationId: initiateYouTubeOAuth
-      security:
-        - bearerAuth: []
-      responses:
-        '302':
-          description: Redirect to Google OAuth consent screen
-          headers:
-            Location:
-              schema:
-                type: string
-              description: Google OAuth authorization URL
-        '401':
-          description: User not authenticated
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '500':
-          description: Server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-
-  /auth/youtube/callback:
-    get:
-      tags:
-        - YouTube OAuth
-      summary: Handle YouTube OAuth callback
-      description: |
-        Receives authorization code from Google, exchanges for tokens,
-        stores encrypted credentials in User document, and redirects to /upload.
-      operationId: handleYouTubeOAuthCallback
-      parameters:
-        - name: code
-          in: query
-          required: true
-          schema:
-            type: string
-          description: Authorization code from Google
-        - name: error
-          in: query
-          required: false
-          schema:
-            type: string
-          description: Error message if user denied consent
-      responses:
-        '302':
-          description: Redirect to /upload page (success) or /upload?error=... (failure)
-          headers:
-            Location:
-              schema:
-                type: string
-        '400':
-          description: Invalid authorization code or missing parameters
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '500':
-          description: Server error during token exchange
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+  REMOVED: YouTube feature - /auth/youtube and /auth/youtube/callback endpoints removed
 
   /cloudinary/sign-cloudinary-params:
     post:
@@ -285,40 +215,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 
-  /user/youtube-status:
-    get:
-      tags:
-        - User
-      summary: Get user's YouTube connection status
-      description: |
-        Checks if the authenticated user has a valid YouTube connection
-        (non-expired access token). Used to determine Connect YouTube button visibility.
-      operationId: getYouTubeStatus
-      security:
-        - bearerAuth: []
-      responses:
-        '200':
-          description: YouTube connection status
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  hasValidConnection:
-                    type: boolean
-                    description: Whether user has valid (non-expired) YouTube credentials
-        '401':
-          description: User not authenticated
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '500':
-          description: Server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+REMOVED: YouTube feature - /user/youtube-status endpoint removed
 
 components:
   securitySchemes:
@@ -433,12 +330,7 @@ components:
         agentServiceNotified:
           type: boolean
           description: Whether agent service was notified
-        youtubePublishAttempted:
-          type: boolean
-          description: Whether YouTube publish was attempted
-        youtubeVideoId:
-          type: string
-          description: YouTube video ID after publishing
+REMOVED: YouTube feature - youtubePublishAttempted and youtubeVideoId fields removed
         metadata:
           type: object
           properties:
@@ -477,9 +369,8 @@ components:
 
 ---
 
+REMOVED: YouTube feature
 ## YouTube OAuth Flow Contract
-
-See [youtube-oauth.md](./youtube-oauth.md) for detailed OAuth flow specification.
 
 ---
 
@@ -503,6 +394,7 @@ See [youtube-oauth.md](./youtube-oauth.md) for detailed OAuth flow specification
 | `MISSING_PARAMS` | 400 | Required parameters missing |
 | `INVALID_DURATION` | 400 | Video duration exceeds 60 seconds |
 | `INVALID_FORMAT` | 400 | Unsupported video format |
+REMOVED: YouTube feature
 | `OAUTH_DENIED` | 403 | User denied OAuth consent |
 | `OAUTH_FAILED` | 500 | OAuth flow failed |
 | `CLOUDINARY_ERROR` | 500 | Cloudinary upload failed |
@@ -515,6 +407,7 @@ See [youtube-oauth.md](./youtube-oauth.md) for detailed OAuth flow specification
 
 1. **Authentication**: All endpoints except `/auth/youtube/callback` require valid Clerk authentication
 2. **Authorization**: Users can only access their own video uploads
+REMOVED: YouTube feature
 3. **Encryption**: YouTube credentials must be encrypted at rest
 4. **HTTPS**: All production endpoints must use HTTPS
 5. **CORS**: API routes should only accept requests from allowed origins

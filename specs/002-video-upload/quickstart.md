@@ -5,6 +5,8 @@
 **Updated**: 2026-03-11
 **Version**: 1.1.0
 
+⚠️ **YOUTUBE FEATURES REMOVED** — YouTube OAuth, channel access, YouTube upload, YouTube connection checks, and YouTube Data API integration have been permanently removed from this project. This file is preserved for historical reference only.
+
 This guide provides step-by-step implementation instructions for the video upload feature with YouTube OAuth and Cloudinary integration.
 
 ---
@@ -14,7 +16,7 @@ This guide provides step-by-step implementation instructions for the video uploa
 1. **Node.js**: v18+ installed
 2. **MongoDB**: Connection string in `MONGODB_URI`
 3. **Cloudinary Account**: With upload preset 'GoViral-Video' configured
-4. **Google Cloud Console**: OAuth 2.0 credentials configured
+4. REMOVED: YouTube feature - **Google Cloud Console**: OAuth 2.0 credentials configured
 5. **Clerk Authentication**: Set up in the project
 
 ---
@@ -23,10 +25,9 @@ This guide provides step-by-step implementation instructions for the video uploa
 
 ```bash
 cd web_app
-npm install next-cloudinary google-auth-library
-```
+npm install next-cloudinary
 
-**Note**: These are the only new dependencies. All other dependencies (axios, mongoose, etc.) are already in the project.
+**Note**: google-auth-library dependency has been removed (YouTube OAuth removed). All other dependencies (axios, mongoose, etc.) are already in the project.
 
 ---
 
@@ -39,10 +40,6 @@ Ensure the following environment variables are set in `.env.local`:
 NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=your_cloud_name
 CLOUDINARY_API_KEY=your_api_key
 CLOUDINARY_API_SECRET=your_api_secret
-
-# Google YouTube OAuth
-NEXT_PUBLIC_GOOGLE_YOUTUBE_CLIENT_ID=your_client_id.apps.googleusercontent.com
-GOOGLE_YOUTUBE_CLIENT_SECRET=your_client_secret
 
 # Database
 MONGODB_URI=mongodb+srv://...
@@ -85,83 +82,10 @@ export function signCloudinaryParams(paramsToSign: Record<string, any>) {
 
 ---
 
+REMOVED: YouTube feature
 ## Step 4: Create YouTube OAuth Utilities
 
-**File**: `web_app/lib/youtube-oauth.ts`
-
-```typescript
-import { OAuth2Client } from 'google-auth-library';
-import crypto from 'crypto';
-
-// OAuth2 client initialization
-export function getOAuth2Client() {
-  return new OAuth2Client(
-    process.env.NEXT_PUBLIC_GOOGLE_YOUTUBE_CLIENT_ID,
-    process.env.GOOGLE_YOUTUBE_CLIENT_SECRET,
-    'http://localhost:3000/api/auth/youtube/callback'
-  );
-}
-
-// Generate authorization URL
-export function generateYouTubeAuthUrl(state?: string) {
-  const oauth2Client = getOAuth2Client();
-  
-  const authUrl = oauth2Client.generateAuthUrl({
-    access_type: 'offline',
-    scope: [
-      'https://www.googleapis.com/auth/youtube.upload',
-      'https://www.googleapis.com/auth/youtube',
-    ],
-    prompt: 'consent',
-    state, // Optional CSRF protection
-  });
-  
-  return authUrl;
-}
-
-// Exchange authorization code for tokens
-export async function exchangeCodeForTokens(code: string) {
-  const oauth2Client = getOAuth2Client();
-  const { tokens } = await oauth2Client.getToken(code);
-  return tokens;
-}
-
-// Encryption utilities (AES-256-GCM)
-const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY || crypto.randomBytes(32).toString('hex');
-const IV_LENGTH = 16;
-
-export function encrypt(text: string): string {
-  const iv = crypto.randomBytes(IV_LENGTH);
-  const cipher = crypto.createCipheriv('aes-256-gcm', Buffer.from(ENCRYPTION_KEY, 'hex'), iv);
-  let encrypted = cipher.update(text, 'utf8', 'hex');
-  encrypted += cipher.final('hex');
-  const authTag = cipher.getAuthTag().toString('hex');
-  return iv.toString('hex') + ':' + authTag + ':' + encrypted;
-}
-
-export function decrypt(encrypted: string): string {
-  const parts = encrypted.split(':');
-  const iv = Buffer.from(parts[0], 'hex');
-  const authTag = Buffer.from(parts[1], 'hex');
-  const encryptedText = parts[2];
-  const decipher = crypto.createDecipheriv(
-    'aes-256-gcm',
-    Buffer.from(ENCRYPTION_KEY, 'hex'),
-    iv
-  );
-  decipher.setAuthTag(authTag);
-  let decrypted = decipher.update(encryptedText, 'hex', 'utf8');
-  decrypted += decipher.final('utf8');
-  return decrypted;
-}
-
-// Check if token is expired (with 5-minute buffer)
-export function isTokenExpired(expiryDate: Date): boolean {
-  const now = new Date();
-  const buffer = 5 * 60 * 1000; // 5 minutes
-  return expiryDate.getTime() - now.getTime() < buffer;
-}
-```
+This step has been removed. The file `web_app/lib/youtube-oauth.ts` and all OAuth-related code (google-auth-library, encryption/decryption of tokens, token expiry checks) is no longer part of the project.
 
 ---
 
@@ -246,13 +170,7 @@ const VideoUploadSchema: Schema<IVideoUpload> = new Schema(
       type: Boolean,
       default: false,
     },
-    youtubePublishAttempted: {
-      type: Boolean,
-      default: false,
-    },
-    youtubeVideoId: {
-      type: String,
-    },
+    // REMOVED: YouTube feature - youtubePublishAttempted and youtubeVideoId fields removed
     metadata: {
       resourceType: String,
       width: Number,
@@ -278,153 +196,17 @@ export default VideoUpload;
 
 ---
 
+REMOVED: YouTube feature
 ## Step 6: Extend User Model with YouTube Credentials
 
-**File**: `web_app/models/User.ts` (update existing model)
-
-```typescript
-// Add this interface to existing User model
-interface YouTubeCredentials {
-  accessToken: string;      // Encrypted
-  refreshToken: string;     // Encrypted
-  tokenExpiry: Date;
-  channelId?: string;
-}
-
-// Add to existing User schema
-youtubeCredentials: {
-  accessToken: { type: String, required: true },
-  refreshToken: { type: String, required: true },
-  tokenExpiry: { type: Date, required: true },
-  channelId: String,
-},
-```
+This step has been removed. No YouTube credential fields exist in the User model.
 
 ---
 
+REMOVED: YouTube feature
 ## Step 7: Create YouTube OAuth API Routes
 
-### Initiate OAuth Flow
-
-**File**: `web_app/app/api/auth/youtube/route.ts`
-
-```typescript
-import { NextRequest, NextResponse } from 'next/server';
-import { getAuth } from '@clerk/nextjs/server';
-import { generateYouTubeAuthUrl } from '@/lib/youtube-oauth';
-import User from '@/models/User';
-import { connectToDatabase } from '@/lib/db';
-
-export async function GET(request: NextRequest) {
-  try {
-    // Check authentication
-    const { userId } = getAuth(request as any);
-    if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    // Check if user already has valid YouTube credentials
-    await connectToDatabase();
-    const user = await User.findOne({ clerkId: userId }, { youtubeCredentials: 1 });
-
-    if (user?.youtubeCredentials) {
-      const now = new Date();
-      if (user.youtubeCredentials.tokenExpiry > now) {
-        // Token still valid, redirect to upload
-        return NextResponse.redirect(new URL('/upload', request.url));
-      }
-    }
-
-    // Generate OAuth URL
-    const authUrl = generateYouTubeAuthUrl();
-
-    // Redirect to Google OAuth
-    return NextResponse.redirect(authUrl);
-  } catch (error) {
-    console.error('YouTube OAuth initiation error:', error);
-    return NextResponse.json(
-      { error: 'Failed to initiate YouTube OAuth' },
-      { status: 500 }
-    );
-  }
-}
-```
-
-### Handle OAuth Callback
-
-**File**: `web_app/app/api/auth/youtube/callback/route.ts`
-
-```typescript
-import { NextRequest, NextResponse } from 'next/server';
-import { getAuth } from '@clerk/nextjs/server';
-import { exchangeCodeForTokens, encrypt } from '@/lib/youtube-oauth';
-import User from '@/models/User';
-import { connectToDatabase } from '@/lib/db';
-
-export async function GET(request: NextRequest) {
-  const searchParams = request.nextUrl.searchParams;
-  const error = searchParams.get('error');
-  const code = searchParams.get('code');
-
-  // Handle user denial or error
-  if (error) {
-    const redirectUrl = new URL('/upload', request.url);
-    redirectUrl.searchParams.set('error', 'youtube_oauth_denied');
-    redirectUrl.searchParams.set(
-      'message',
-      'YouTube authorization required to upload videos. Please try again.'
-    );
-    return NextResponse.redirect(redirectUrl);
-  }
-
-  if (!code) {
-    return NextResponse.json({ error: 'Missing authorization code' }, { status: 400 });
-  }
-
-  try {
-    // Check authentication
-    const { userId } = getAuth(request as any);
-    if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    // Exchange code for tokens
-    const tokens = await exchangeCodeForTokens(code);
-
-    if (!tokens.access_token || !tokens.refresh_token) {
-      throw new Error('Missing tokens in response');
-    }
-
-    // Encrypt tokens
-    const encryptedAccessToken = encrypt(tokens.access_token);
-    const encryptedRefreshToken = encrypt(tokens.refresh_token);
-
-    // Store in database
-    await connectToDatabase();
-    await User.findOneAndUpdate(
-      { clerkId: userId },
-      {
-        youtubeCredentials: {
-          accessToken: encryptedAccessToken,
-          refreshToken: encryptedRefreshToken,
-          tokenExpiry: new Date(tokens.expiry_date!),
-          channelId: tokens.channel_id,
-        },
-      },
-      { upsert: true }
-    );
-
-    // Redirect to upload page
-    return NextResponse.redirect(new URL('/upload', request.url));
-  } catch (error) {
-    console.error('YouTube OAuth callback error:', error);
-    const redirectUrl = new URL('/upload', request.url);
-    redirectUrl.searchParams.set('error', 'youtube_oauth_failed');
-    redirectUrl.searchParams.set('message', 'Unable to complete YouTube authorization. Please try again.');
-    return NextResponse.redirect(redirectUrl);
-  }
-}
-```
+This step has been removed. The files `web_app/app/api/auth/youtube/route.ts` and `web_app/app/api/auth/youtube/callback/route.ts` no longer exist in the project.
 
 ---
 
@@ -899,138 +681,24 @@ export const metadata: Metadata = {
 
 ---
 
+REMOVED: YouTube feature
 ## Step 13: Create Connect YouTube Button Component
 
-**File**: `web_app/src/components/layout/ConnectYouTubeButton.tsx`
-
-```typescript
-'use client'
-
-import { useUser } from '@clerk/nextjs'
-import { YouTubeIcon } from 'lucide-react' // or react-icons
-import { useEffect, useState } from 'react'
-import axios from 'axios'
-
-interface UserData {
-  youtubeAccessToken?: string
-  youtubeTokenExpiry?: string
-}
-
-export function ConnectYouTubeButton() {
-  const { isLoaded, isSignedIn, user } = useUser()
-  const [hasYouTubeConnection, setHasYouTubeConnection] = useState(false)
-  const [isLoading, setIsLoading] = useState(true)
-
-  useEffect(() => {
-    async function checkYouTubeConnection() {
-      if (!isLoaded || !isSignedIn) {
-        setIsLoading(false)
-        return
-      }
-
-      try {
-        const response = await axios.get('/api/user/youtube-status')
-        setHasYouTubeConnection(response.data.hasValidConnection)
-      } catch (error) {
-        console.error('Error checking YouTube connection:', error)
-      } finally {
-        setIsLoading(false)
-      }
-    }
-
-    checkYouTubeConnection()
-  }, [isLoaded, isSignedIn, user])
-
-  if (!isLoaded || !isSignedIn) {
-    return null
-  }
-
-  if (isLoading) {
-    return <div className="animate-pulse">Checking...</div>
-  }
-
-  if (hasYouTubeConnection) {
-    return (
-      <div className="flex items-center gap-2 text-green-600 px-4 py-2">
-        <YouTubeIcon className="w-5 h-5" />
-        <span className="text-sm font-medium">YouTube Connected</span>
-      </div>
-    )
-  }
-
-  return (
-    <form action="/api/auth/youtube">
-      <button
-        type="submit"
-        className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm font-medium"
-      >
-        <YouTubeIcon className="w-5 h-5" />
-        Connect YouTube
-      </button>
-    </form>
-  )
-}
-```
+This step has been removed. The `ConnectYouTubeButton` component no longer exists in the project.
 
 ---
 
+REMOVED: YouTube feature
 ## Step 14: Add YouTube Status Check API Route
 
-**File**: `web_app/src/app/api/user/youtube-status/route.ts`
-
-```typescript
-import { NextRequest, NextResponse } from 'next/server'
-import { getAuth } from '@clerk/nextjs/server'
-import { User } from '@/models/User'
-import { connectToDatabase } from '@/lib/db'
-
-export async function GET(request: NextRequest) {
-  try {
-    const { userId } = getAuth(request as any)
-    if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
-    await connectToDatabase()
-    const user = await User.findOne({ clerkId: userId }, { youtubeAccessToken: 1, youtubeTokenExpiry: 1 })
-
-    const hasValidConnection = 
-      user?.youtubeAccessToken && 
-      user.youtubeTokenExpiry && 
-      new Date(user.youtubeTokenExpiry) > new Date()
-
-    return NextResponse.json({ hasValidConnection })
-  } catch (error) {
-    console.error('YouTube status check error:', error)
-    return NextResponse.json(
-      { error: 'Failed to check YouTube connection status' },
-      { status: 500 }
-    )
-  }
-}
-```
+This step has been removed. The `youtube-status` endpoint no longer exists in the project.
 
 ---
 
+REMOVED: YouTube feature
 ## Step 15: Integrate Connect YouTube Button into Navbar/Sidebar
 
-**File**: `web_app/src/components/layout/Navbar.tsx` (or your navbar component)
-
-```typescript
-import { ConnectYouTubeButton } from './ConnectYouTubeButton'
-
-export function Navbar() {
-  return (
-    <nav className="navbar">
-      {/* ... existing navbar content */}
-      <div className="navbar-actions">
-        <ConnectYouTubeButton />
-        {/* ... other navbar items */}
-      </div>
-    </nav>
-  )
-}
-```
+This step has been removed. No YouTube connection UI exists in the Navbar/Sidebar.
 
 ---
 
@@ -1038,11 +706,7 @@ export function Navbar() {
 
 ### Test Checklist
 
-1. **OAuth Flow**:
-   - [ ] User without YouTube credentials is redirected to Google OAuth
-   - [ ] User grants permission and is redirected back to /upload
-   - [ ] Credentials are stored encrypted in database
-   - [ ] User with valid credentials goes directly to /upload
+1. REMOVED: YouTube feature - **OAuth Flow** section removed
 
 2. **Upload Flow**:
    - [ ] Upload widget opens and allows file selection
@@ -1053,11 +717,7 @@ export function Navbar() {
    - [ ] Metadata is stored in database
    - [ ] Agent service is notified (dummy URL)
 
-3. **Connect YouTube Button**:
-   - [ ] Button visible in Navbar/Sidebar for users without YouTube connection
-   - [ ] Button click triggers OAuth flow
-   - [ ] Button shows "YouTube Connected" state after successful OAuth
-   - [ ] Button hidden/replaced for users with valid connection
+3. REMOVED: YouTube feature - **Connect YouTube Button** section removed
 
 4. **SEO Optimization**:
    - [ ] Upload page has correct title and description
@@ -1081,14 +741,10 @@ export function Navbar() {
 
 ## Troubleshooting
 
+REMOVED: YouTube feature
 ### OAuth Callback Returns Error
 
-**Problem**: `youtube_oauth_denied` or `youtube_oauth_failed`
-
-**Solutions**:
-1. Verify redirect URI is correctly configured in Google Cloud Console
-2. Check that OAuth scopes are correct
-3. Ensure client ID and secret are correct in environment variables
+---
 
 ### Cloudinary Upload Fails
 
@@ -1108,14 +764,8 @@ export function Navbar() {
 2. Verify Cloudinary returns duration in metadata
 3. Add server-side validation in `/api/videos` route
 
+REMOVED: YouTube feature
 ### Connect YouTube Button Not Showing
-
-**Problem**: Button doesn't appear in Navbar
-
-**Solutions**:
-1. Check user authentication status
-2. Verify `/api/user/youtube-status` endpoint is working
-3. Check browser console for errors
 
 ---
 

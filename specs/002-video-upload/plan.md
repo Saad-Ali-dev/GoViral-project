@@ -1,15 +1,18 @@
+⚠️ **YOUTUBE FEATURES REMOVED** — YouTube OAuth, channel access, YouTube upload, YouTube connection checks, and YouTube Data API integration have been permanently removed from this project. This file is preserved for historical reference only.
+
 # Implementation Plan: Video Upload with YouTube OAuth & Cloudinary
 
 **Branch**: `002-video-upload` | **Date**: 2026-03-10 | **Updated**: 2026-03-11 | **Spec**: [spec.md](./spec.md)
 
 ## Summary
 
-Implement a complete video upload feature for GoViral that enables signed-in users to upload short-form videos (<60s, <50MB) to Cloudinary storage, with integrated YouTube OAuth 2.0 verification for future publishing. The feature includes frontend security checks (pre-upload: file type/size; post-upload: duration), real-time upload progress, metadata storage in MongoDB, and agent service notification (dummy URL for now). YouTube OAuth flow is triggered by two conditions: (1) when upload process starts after login check, and (2) via a dedicated 'Connect YouTube' button in the Navbar/Sidebar. The feature is fully SEO and performance optimized with no upload state persistence.
+Implement a complete video upload feature for GoViral that enables signed-in users to upload short-form videos (<60s, <50MB) to Cloudinary storage. The feature includes frontend security checks (pre-upload: file type/size; post-upload: duration), real-time upload progress, metadata storage in MongoDB, and agent service notification (dummy URL for now). The feature is fully SEO and performance optimized with no upload state persistence.
 
 ## Technical Context
 
 **Language/Version**: TypeScript 5, Next.js 16.1.1, React 19.2.3
-**Primary Dependencies**: next-cloudinary (CldUploadWidget), google-auth-library (OAuth 2.0), axios 1.13.2, react-icons 5.5.0
+**Primary Dependencies**: next-cloudinary (CldUploadWidget), axios 1.13.2, react-icons 5.5.0
+REMOVED: YouTube feature - google-auth-library (OAuth 2.0) dependency removed
 **Storage**: MongoDB (via mongoose 9.1.3), Cloudinary (video/thumbnail storage)
 **Testing**: N/A (Excluded per Constitution Rule 6)
 **Target Platform**: Web application (Next.js SSR/CSR hybrid)
@@ -25,6 +28,7 @@ Implement a complete video upload feature for GoViral that enables signed-in use
 **Technology Stack Compliance**:
 - [x] Frontend: Next.js, React, Tailwind CSS, TypeScript only
 - [x] Backend: Next.js API routes (Python Agent Service deferred)
+REMOVED: YouTube feature
 - [x] No unauthorized dependencies (next-cloudinary and google-auth-library are standard for this use case)
 
 **Quality Standards**:
@@ -37,6 +41,7 @@ Implement a complete video upload feature for GoViral that enables signed-in use
 **Development Practices**:
 - [x] Existing code reused; search conducted before creating new functions
 - [x] DRY principle followed; no duplicate implementations
+REMOVED: YouTube feature
 - [x] Dependencies are minimal and approved (next-cloudinary, google-auth-library)
 - [x] Only explicitly requested features implemented; no additional functionality
 
@@ -73,10 +78,10 @@ web_app/
 │   │   │   └── page.tsx           # Upload page with CldUploadWidget centered, SEO metadata
 │   │   └── api/
 │   │       ├── auth/
-│   │       │   └── youtube/
-│   │       │       ├── route.ts   # Initiate YouTube OAuth flow
+│   │       │   └── youtube/       # REMOVED: YouTube feature
+│   │       │       ├── route.ts   # Initiate YouTube OAuth flow (REMOVED)
 │   │       │       └── callback/
-│   │       │           └── route.ts # Handle OAuth callback
+│   │       │           └── route.ts # Handle OAuth callback (REMOVED)
 │   │       ├── cloudinary/
 │   │       │   └── sign-cloudinary-params/
 │   │       │       └── route.ts   # Sign Cloudinary upload params
@@ -87,14 +92,14 @@ web_app/
 │   │   │   ├── VideoUploadWidget.tsx  # Wrapper for CldUploadWidget with progress
 │   │   │   └── UploadProgress.tsx     # Progress indicator component
 │   │   └── layout/
-│   │       └── ConnectYouTubeButton.tsx  # YouTube connection button for Navbar/Sidebar
+│   │       └── ConnectYouTubeButton.tsx  # REMOVED: YouTube feature
 │   ├── lib/
 │   │   ├── cloudinary.ts        # Cloudinary configuration
-│   │   ├── youtube-oauth.ts     # YouTube OAuth utilities
+│   │   ├── youtube-oauth.ts     # REMOVED: YouTube feature
 │   │   └── db.ts                # MongoDB connection
 │   └── models/
 │       ├── Video.ts             # VideoUpload schema with User relationship
-│       └── User.ts              # User schema with YouTube credentials
+│       └── User.ts              # User schema (YouTube credentials removed)
 └── .env.local               # Environment variables (already configured)
 ```
 
@@ -153,44 +158,10 @@ web_app/
 </CldUploadWidget>
 ```
 
+REMOVED: YouTube feature
 ### Research 2: YouTube OAuth 2.0 Flow
 
-**Decision**: Use Google OAuth 2.0 with authorization code flow, offline access for refresh tokens, scopes for YouTube upload
-
-**Rationale**:
-- Required scopes: `https://www.googleapis.com/auth/youtube.upload` and `https://www.googleapis.com/auth/youtube`
-- Offline access (`access_type: 'offline'`) ensures refresh token for long-term access
-- `prompt: 'consent'` ensures refresh token is returned on first authorization
-- Callback URI: `http://localhost:3000/api/auth/youtube/callback` (configured in Google Cloud Console)
-- Credentials stored encrypted in User document (accessToken, refreshToken, expiry, channelId)
-
-**Alternatives considered**:
-- OAuth 2.0 implicit flow: Rejected due to security concerns (tokens exposed in URL)
-- Service account authentication: Rejected - requires user consent for YouTube upload
-- PKCE flow: Considered but standard authorization code flow sufficient for server-side app
-
-**Implementation pattern**:
-```typescript
-// Initiate OAuth flow
-const oauth2Client = new OAuth2Client(
-  process.env.NEXT_PUBLIC_GOOGLE_YOUTUBE_CLIENT_ID,
-  process.env.GOOGLE_YOUTUBE_CLIENT_SECRET,
-  'http://localhost:3000/api/auth/youtube/callback'
-);
-
-const authUrl = oauth2Client.generateAuthUrl({
-  access_type: 'offline',
-  scope: [
-    'https://www.googleapis.com/auth/youtube.upload',
-    'https://www.googleapis.com/auth/youtube'
-  ],
-  prompt: 'consent'
-});
-
-// Handle callback and exchange code for tokens
-const { tokens } = await oauth2Client.getToken(code);
-// Store tokens encrypted in User document
-```
+---
 
 ### Research 3: Frontend Video Validation
 
@@ -273,35 +244,10 @@ export const metadata = {
 }
 ```
 
+REMOVED: YouTube feature
 ### Research 7: Connect YouTube Button Placement
 
-**Decision**: Implement 'Connect YouTube' button in Navbar/Sidebar with conditional rendering based on OAuth status
-
-**Rationale**:
-- Provides proactive YouTube connection without interrupting upload flow
-- Improves user experience by allowing setup at user's convenience
-- Button visibility controlled by checking youtubeCredentials in User document
-- Consistent placement in main navigation ensures discoverability
-
-**Implementation pattern**:
-```tsx
-// components/layout/ConnectYouTubeButton.tsx
-async function ConnectYouTubeButton() {
-  const user = await getCurrentUser();
-  const hasYouTubeConnection = user?.youtubeAccessToken && 
-    new Date(user.youtubeTokenExpiry) > new Date();
-
-  if (hasYouTubeConnection) {
-    return <ConnectedIndicator />;
-  }
-
-  return (
-    <form action="/api/auth/youtube">
-      <button type="submit">Connect YouTube</button>
-    </form>
-  );
-}
-```
+---
 
 ### Research 8: No Upload State Persistence Strategy
 
@@ -329,7 +275,7 @@ async function ConnectYouTubeButton() {
 See [data-model.md](./data-model.md) for complete entity definitions, validation rules, and state transitions.
 
 **Key Entities**:
-1. **User** (existing, extended): YouTube OAuth credentials embedded (accessToken, refreshToken, tokenExpiry)
+1. **User** (existing, extended): YouTube OAuth credentials embedded (accessToken, refreshToken, tokenExpiry) [REMOVED: YouTube feature]
 2. **Video**: Collection for video upload tracking (userId/clerkId, cloudinaryUrl, thumbnailUrl, size, duration, status, aiResponse)
 
 ### API Contracts
@@ -337,7 +283,8 @@ See [data-model.md](./data-model.md) for complete entity definitions, validation
 See [contracts/](./contracts/) for OpenAPI specification.
 
 **Endpoints**:
-1. `GET /api/auth/youtube` - Initiate YouTube OAuth flow (triggered by upload or Connect YouTube button)
+REMOVED: YouTube feature
+1. `GET /api/auth/youtube` - Initiate YouTube OAuth flow
 2. `GET /api/auth/youtube/callback` - Handle OAuth callback
 3. `POST /api/cloudinary/sign-cloudinary-params` - Sign Cloudinary upload parameters
 4. `POST /api/videos` - Store video metadata after upload
@@ -362,14 +309,14 @@ See [quickstart.md](./quickstart.md) for implementation steps and code examples.
 ## Phase 2: Implementation Sequence (Summary)
 
 1. **Setup**: Install next-cloudinary, configure Cloudinary SDK
-2. **YouTube OAuth**: Implement OAuth initiation and callback routes
+2. REMOVED: YouTube feature - **YouTube OAuth**: Implement OAuth initiation and callback routes
 3. **Cloudinary**: Implement signing endpoint and upload widget
 4. **Video Model**: Create Video.ts schema with validation
 5. **Upload Flow**: Build /upload page with centered widget, progress, and SEO metadata
 6. **Metadata Storage**: Store video data and notify agent service (dummy URL)
 7. **Error Handling**: Implement comprehensive error messages per spec
 8. **UI Polish**: Responsive design, loading states, success/error feedback
-9. **Connect YouTube Button**: Add button to Navbar/Sidebar with conditional rendering
+9. REMOVED: YouTube feature - **Connect YouTube Button**: Add button to Navbar/Sidebar with conditional rendering
 10. **SEO Optimization**: Ensure /upload page has complete metadata and semantic HTML
 
 ---

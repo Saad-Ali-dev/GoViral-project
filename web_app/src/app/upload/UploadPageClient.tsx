@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react"
 import { useUser } from "@clerk/nextjs"
-import { useRouter, useSearchParams } from "next/navigation"
+import { useRouter } from "next/navigation"
 import { VideoUploadWidget } from "../../components/upload/VideoUploadWidget"
 import { UploadProgress } from "../../components/upload/UploadProgress"
 import {
@@ -14,39 +14,13 @@ import axios from "axios"
 export default function UploadPageClient() {
   const { isLoaded, isSignedIn } = useUser()
   const router = useRouter()
-  const searchParams = useSearchParams()
   const [uploadProgress, setUploadProgress] = useState(0)
   const [isUploading, setIsUploading] = useState(false)
   const [uploadStatus, setUploadStatus] = useState<
     "idle" | "uploading" | "processing" | "success" | "error"
   >("idle")
   const [errorMessage, setErrorMessage] = useState("")
-  const [hasYouTubeConnection, setHasYouTubeConnection] = useState(false)
-  const [checkingYouTube, setCheckingYouTube] = useState(true)
   const progressIntervalRef = useRef<NodeJS.Timeout | null>(null)
-
-  // Check YouTube OAuth status on mount
-  useEffect(() => {
-    async function checkYouTubeStatus() {
-      if (!isSignedIn) {
-        setCheckingYouTube(false)
-        return
-      }
-
-      try {
-        const response = await axios.get("/api/user/youtube-status")
-        setHasYouTubeConnection(response.data.isConnected)
-      } catch (error) {
-        console.error("Failed to check YouTube status:", error)
-        // Don't block upload if status check fails
-        setHasYouTubeConnection(false)
-      } finally {
-        setCheckingYouTube(false)
-      }
-    }
-
-    checkYouTubeStatus()
-  }, [isSignedIn])
 
   // Cleanup interval on unmount
   useEffect(() => {
@@ -97,12 +71,6 @@ export default function UploadPageClient() {
   }
 
   const handleUploadStart = async () => {
-    // Check YouTube connection before allowing upload
-    if (!hasYouTubeConnection && !checkingYouTube) {
-      setErrorMessage(UPLOAD_ERROR_MESSAGES.YOUTUBE_OAUTH_REQUIRED)
-      setUploadStatus("error")
-      return false // Prevent upload
-    }
     return true // Allow upload
   }
 
@@ -177,37 +145,6 @@ export default function UploadPageClient() {
             </p>
           </header>
 
-          {/* OAuth Error Display */}
-          {searchParams.get("error") && (
-            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-              <p className="text-red-800 font-medium">
-                {searchParams.get("message") ||
-                  "YouTube authorization required"}
-              </p>
-            </div>
-          )}
-
-          {/* YouTube Connection Status */}
-          {!checkingYouTube && !hasYouTubeConnection && (
-            <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-              <p className="text-yellow-800 font-medium mb-2">
-                YouTube account not connected
-              </p>
-              <p className="text-yellow-700 text-sm mb-3">
-                Connect your YouTube account to upload videos and enable
-                automatic publishing.
-              </p>
-              <form action="/api/auth/youtube" method="GET">
-                <button
-                  type="submit"
-                  className="px-4 py-2 bg-[#C7161C] text-white rounded-lg hover:bg-[#C7161C]/90 transition-colors font-medium text-sm"
-                >
-                  Connect YouTube Account
-                </button>
-              </form>
-            </div>
-          )}
-
           {/* Upload Widget */}
           <div className="flex justify-center">
             <VideoUploadWidget
@@ -227,9 +164,7 @@ export default function UploadPageClient() {
               onUploadError={handleUploadError}
               disabled={
                 isUploading ||
-                uploadStatus === "processing" ||
-                checkingYouTube ||
-                !hasYouTubeConnection
+                uploadStatus === "processing"
               }
             />
           </div>
@@ -311,7 +246,6 @@ export default function UploadPageClient() {
               <li>Generates optimized title and description</li>
               <li>Suggests relevant tags and keywords</li>
               <li>Recommends thumbnail improvements</li>
-              <li>Ready for YouTube publishing</li>
             </ol>
           </section>
         </article>

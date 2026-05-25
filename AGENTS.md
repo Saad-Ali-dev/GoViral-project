@@ -1,8 +1,8 @@
 # Project / Repo Overview
 
-**Purpose**: GoViral app automates SEO preparation and publishing for short-form videos on Youtube. It takes an uploaded video, analyzes video and audio, produces SEO-ready metadata (titles, short/long descriptions, tags, hashtags, keywords), runs safety checks, and delivers a human-reviewable package that can be published to YouTube on approval.
+**Purpose**: GoViral app automates SEO preparation for short-form videos. It takes an uploaded video, analyzes video and audio, produces SEO-ready metadata (titles, descriptions, tags, hashtags, keywords), runs safety checks, and delivers a human-reviewable package for approval.
 
-**The Problem this project solves**: Creating SEO-optimized metadata for videos is time-consuming and requires expertise. GoViral leverages AI to automate this process, saving content creators time and improving their video's reach and help them grow on Youtube.
+**The Problem this project solves**: Creating SEO-optimized metadata for videos is time-consuming and requires expertise. GoViral leverages AI to automate this process, saving content creators time and improving their video's reach across platforms.
 
 # Technology Stack & Architecture
 

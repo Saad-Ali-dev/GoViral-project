@@ -7,17 +7,15 @@ import UploadPageClient from "./UploadPageClient"
  */
 export const metadata: Metadata = {
   title:
-    "Upload Video - GoViral | AI-Powered YouTube SEO Optimization",
+    "Upload Video - GoViral | AI-Powered SEO Optimization",
   description:
-    "Upload your short-form videos to GoViral for AI-powered SEO optimization. Automatically generate titles, descriptions, tags, and thumbnails for YouTube.",
+    "Upload your short-form videos to GoViral for AI-powered SEO optimization. Automatically generate titles, descriptions, tags, and keywords optimized for discoverability.",
   keywords: [
     "video upload",
-    "YouTube SEO",
-    "AI optimization",
+    "AI SEO",
     "short-form video",
     "content creator tools",
     "video marketing",
-    "YouTube shorts",
     "viral video",
     "video metadata",
   ],
@@ -32,7 +30,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Upload Video - GoViral",
     description:
-      "AI-powered YouTube SEO optimization for short-form videos",
+      "AI-powered SEO optimization for short-form videos",
     type: "website",
     locale: "en_US",
     siteName: "GoViral",
@@ -42,7 +40,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Upload Video - GoViral",
     description:
-      "AI-powered YouTube SEO optimization for short-form videos",
+      "AI-powered SEO optimization for short-form videos",
     creator: "@goviral",
   },
   robots: {

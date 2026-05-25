@@ -5,7 +5,7 @@ export interface IVideo extends Document {
   originalFilename?: string
   size: number
   duration: number
-  status: "pending" | "processing" | "completed" | "failed" | "published"
+  status: "pending" | "processing" | "completed" | "failed"
   cloudinaryUrl?: string
   thumbnailUrl?: string
   publicId?: string
@@ -13,11 +13,8 @@ export interface IVideo extends Document {
     title: string
     description: string
     tags: string[]
-    categoryId: number
     viralScore: number
   }
-  youtubeUrl?: string
-  youtubeVideoId?: string
   metadata?: {
     resourceType?: string
     width?: number
@@ -26,7 +23,6 @@ export interface IVideo extends Document {
     tags?: string[]
     originalFilename?: string
   }
-  agentServiceNotified?: boolean
   createdAt: Date
   updatedAt: Date
 }
@@ -40,7 +36,7 @@ const videoSchema = new mongoose.Schema<IVideo>(
     status: {
       type: String,
       required: true,
-      enum: ["pending", "processing", "completed", "failed", "published"],
+      enum: ["pending", "processing", "completed", "failed"],
       default: "pending",
     },
     cloudinaryUrl: { type: String },
@@ -50,11 +46,8 @@ const videoSchema = new mongoose.Schema<IVideo>(
       title: String,
       description: String,
       tags: [String],
-      categoryId: Number,
       viralScore: Number,
     },
-    youtubeUrl: { type: String },
-    youtubeVideoId: { type: String },
     metadata: {
       resourceType: String,
       width: Number,
@@ -63,7 +56,6 @@ const videoSchema = new mongoose.Schema<IVideo>(
       tags: [String],
       originalFilename: String,
     },
-    agentServiceNotified: { type: Boolean, default: true },
   },
   {
     timestamps: true,

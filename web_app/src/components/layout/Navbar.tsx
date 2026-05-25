@@ -6,7 +6,6 @@ import Image from "next/image"
 import { FaBars } from "react-icons/fa6"
 import { SignedIn, SignedOut, UserButton } from "@clerk/nextjs"
 import Sidebar from "./Sidebar"
-import ConnectYouTubeButton from "./ConnectYouTubeButton"
 
 export default function Navbar() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
@@ -61,8 +60,6 @@ export default function Navbar() {
             </Link>
           </SignedOut>
           <SignedIn>
-            {/* Connect YouTube Button (only when signed in) */}
-            <ConnectYouTubeButton />
             <UserButton
               afterSignOutUrl="/"
               appearance={{

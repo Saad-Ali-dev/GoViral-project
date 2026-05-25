@@ -1,6 +1,6 @@
 # GoViral
 
-AI-powered SEO automation for YouTube Shorts. Upload a video, get optimized titles, descriptions, tags, thumbnails, and publish directly to YouTube.
+AI-powered SEO automation for short-form videos. Upload a video, get optimized titles, descriptions, tags, and thumbnails optimized for discoverability.
 
 ## The Problem
 
@@ -8,7 +8,7 @@ Creating SEO-optimized metadata for videos is time-consuming and requires expert
 
 ## The Solution
 
-GoViral automates the entire SEO workflow using AI. Upload a short-form video, and the app analyzes its visual and audio content, generates SEO-ready metadata, runs safety checks, and delivers a human-reviewable package ready for YouTube publishing.
+GoViral automates the entire SEO workflow using AI. Upload a short-form video, and the app analyzes its visual and audio content, generates SEO-ready metadata, runs safety checks, and delivers a human-reviewable package ready for approval.
 
 ## How It Works
 
@@ -18,7 +18,6 @@ GoViral automates the entire SEO workflow using AI. Upload a short-form video, a
    - **SEO Generation** — Title, description, tags, category, and viral score
    - **Thumbnail Generation** — AI-generated thumbnail based on video content
 3. **Review & Edit** — Review the generated metadata and make any edits
-4. **Publish** — Upload directly to your YouTube channel
 
 ## Architecture
 
@@ -35,7 +34,7 @@ GoViral uses a **dual-backend architecture** with strict separation of concerns.
 │  ┌──────────┐  ┌──────────┐  ┌───────────────────┐  │
 │  │  React UI │  │ Clerk    │  │  API Routes       │  │
 │  │  (SSR/CSR)│  │ Auth     │  │  /api/videos      │  │
-│  └──────────┘  └──────────┘  │  /api/auth/youtube│  │
+│  └──────────┘  └──────────┘  │                   │  │
 │                              │  /api/user/*       │  │
 │  ┌──────────┐  ┌──────────┐  └─────────┬─────────┘  │
 │  │ MongoDB  │  │Cloudinary│            │             │
@@ -67,7 +66,7 @@ The primary backend and frontend, responsible for user interaction, data persist
 | Authentication | Clerk (`@clerk/nextjs` v6.38.2) |
 | Database | MongoDB via Mongoose v9.1.3 |
 | Video Storage | Cloudinary (upload, hosting) |
-| YouTube Integration | Google OAuth 2.0, `google-auth-library` v10.6.1 |
+
 | HTTP Client | Axios v1.13.2 |
 
 ### AI Agent Service (Python)
@@ -94,10 +93,9 @@ A dedicated microservice for AI processing. It does **not** connect to the datab
 ### Backend
 
 - **Next.js API Routes** — REST endpoints for videos, auth, Cloudinary signing
-- **MongoDB** — User accounts, video metadata, OAuth tokens
+- **MongoDB** — User accounts, video metadata
 - **Mongoose 9.1.3** — ODM with schema validation and indexing
 - **Clerk** — Managed authentication with pre-built UI components
-- **AES-256-GCM** — Token encryption for YouTube OAuth credentials
 
 ### AI Service
 
@@ -109,7 +107,6 @@ A dedicated microservice for AI processing. It does **not** connect to the datab
 ### External Services
 
 - **Cloudinary** — Video upload, storage, and delivery (signed uploads)
-- **Google Cloud Console** — YouTube Data API v3, OAuth 2.0 credentials
 - **MongoDB Atlas** — Cloud database
 - **Clerk** — User management and authentication
 
@@ -126,7 +123,6 @@ GoViral-project/
 │   │   │   ├── sign-up/          # Clerk sign-up
 │   │   │   └── api/              # REST API endpoints
 │   │   │       ├── videos/       # Video CRUD operations
-│   │   │       ├── auth/youtube/ # YouTube OAuth flow
 │   │   │       ├── cloudinary/   # Upload signing
 │   │   │       └── user/         # User status checks
 │   │   ├── components/
@@ -135,7 +131,7 @@ GoViral-project/
 │   │   │   ├── upload/           # Upload widget, progress bar
 │   │   │   └── ui/               # Reusable UI primitives
 │   │   ├── models/               # Mongoose schemas (User, Video)
-│   │   ├── lib/                  # DB connection, Cloudinary, OAuth, utils
+│   │   ├── lib/                  # DB connection, Cloudinary, utils
 │   │   └── middleware.ts         # Clerk auth middleware
 │   ├── public/                   # Static assets (logos, animations)
 │   └── .env.example              # Environment variable template
@@ -170,15 +166,12 @@ GoViral-project/
 | `POST` | `/api/videos` | Yes | Store video metadata after Cloudinary upload |
 | `GET` | `/api/videos` | Yes | List user's videos (supports `limit` and `status` filters) |
 | `GET` | `/api/videos/[id]` | Yes | Get a single video by ID |
-| `GET` | `/api/auth/youtube` | Yes | Initiate YouTube OAuth flow |
-| `GET` | `/api/auth/youtube/callback` | No | Handle Google OAuth callback |
 | `POST` | `/api/cloudinary/sign-cloudinary-params` | Yes | Sign Cloudinary upload parameters |
-| `GET` | `/api/user/youtube-status` | Yes | Check YouTube connection status |
 
 ### Video Status Lifecycle
 
 ```
-pending → processing → completed → published
+pending → processing → completed
                     ↘ failed
 ```
 
@@ -191,10 +184,6 @@ pending → processing → completed → published
 | `clerkId` | String | Unique Clerk user ID |
 | `name` | String | User's display name |
 | `email` | String | Unique email address |
-| `youtubeAccessToken` | String | AES-256-GCM encrypted |
-| `youtubeRefreshToken` | String | AES-256-GCM encrypted |
-| `youtubeTokenExpiry` | Date | Token expiration timestamp |
-| `channelId` | String | YouTube channel ID |
 
 ### Video
 
@@ -204,20 +193,14 @@ pending → processing → completed → published
 | `originalFilename` | String | Original file name |
 | `size` | Number | File size in bytes (max 50MB) |
 | `duration` | Number | Duration in seconds (max 60s) |
-| `status` | String | pending / processing / completed / failed / published |
+| `status` | String | pending / processing / completed / failed |
 | `cloudinaryUrl` | String | Hosted video URL |
 | `thumbnailUrl` | String | Generated thumbnail URL |
-| `aiResponse` | Object | `{ title, description, tags[], categoryId, viralScore }` |
-| `youtubeUrl` | String | Published YouTube URL |
-| `youtubeVideoId` | String | YouTube video ID |
+| `aiResponse` | Object | `{ title, description, tags[], viralScore }` |
 
 ## Authentication
 
-Two separate authentication systems:
-
-1. **User Authentication (Clerk)** — Handles sign-up, sign-in, session management. Public routes: `/`, `/sign-in/*`, `/sign-up/*`. All other routes require authentication.
-
-2. **YouTube OAuth (Google)** — Separate OAuth 2.0 flow for YouTube channel access. Tokens are encrypted with AES-256-GCM before database storage. Automatic token refresh with a 5-minute expiry buffer.
+**User Authentication (Clerk)** — Handles sign-up, sign-in, session management. Public routes: `/`, `/sign-in/*`, `/sign-up/*`. All other routes require authentication.
 
 ## Environment Variables
 
@@ -229,9 +212,6 @@ Two separate authentication systems:
 | `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME` | Cloudinary cloud name |
 | `CLOUDINARY_API_KEY` | Cloudinary API key |
 | `CLOUDINARY_API_SECRET` | Cloudinary API secret |
-| `NEXT_PUBLIC_GOOGLE_YOUTUBE_CLIENT_ID` | Google OAuth client ID |
-| `GOOGLE_YOUTUBE_CLIENT_SECRET` | Google OAuth client secret |
-| `ENCRYPTION_KEY` | AES-256-GCM key (generate: `openssl rand -hex 32`) |
 | `AGENT_SERVICE_URL` | Python agent service URL |
 | `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` | Clerk publishable key |
 | `CLERK_SECRET_KEY` | Clerk secret key |
@@ -245,7 +225,6 @@ Two separate authentication systems:
 - Python 3.12+
 - MongoDB Atlas account
 - Cloudinary account
-- Google Cloud Console project with YouTube Data API v3 enabled
 - Clerk account
 
 ### Web App

@@ -6,6 +6,8 @@
 **Status**: Draft  
 **Input**: User description: "video-upload-feature - Workflow (File Upload Feature) When a User clicks on the upload button on the homepage, If the User is signed-in take him to /upload page, then take the video file from User, run Security checks on the frontend, if ok upload to cloudinary, else show error with cause to User UI. When it is uploading show the progress to User, when upload complete get metadata (cloudinary_url, video_size, duration etc) and send to backend and store in db and update UI and also send that data to agent service so that the agent loop execution could begin. if any error occurs during the process, show it with cause to User."
 
+⚠️ **YOUTUBE FEATURES REMOVED** — YouTube OAuth, channel access, YouTube upload, YouTube connection checks, and YouTube Data API integration have been permanently removed from this project. This file is preserved for historical reference only.
+
 ## Clarifications
 
 ### Session 2026-03-09
@@ -13,10 +15,11 @@
 - Q: What specific security checks should run on video files before upload? → A: File should be a video file type and it should be less than <60s duration and size should be less than <50 MB.
 - Q: How should video uploads be uniquely identified in the system? → A: Each video is identified and linked to the user which uploads it by connecting the user clerkid with video that is being uploaded. UUID may also be used if needed.
 - Q: What are the possible lifecycle states for a video upload? → A: Defined in Video.ts: pending, processing, completed, failed, published
-- Q: When should YouTube OAuth verification occur? → A: When user initiates upload process, after login check, verify YouTube access token exists in DB; if not, trigger OAuth flow.
-- Q: What YouTube OAuth scopes are required? → A: Scope for uploading videos to YouTube (https://www.googleapis.com/auth/youtube.upload and https://www.googleapis.com/auth/youtube).
-- Q: How should YouTube credentials be stored? → A: Store access token, refresh token, and expiry in User document in MongoDB, encrypted at rest.
-- Q: What happens if YouTube OAuth flow fails or is cancelled? → A: Show error to user and abort upload process; user can retry OAuth later.
+REMOVED: YouTube feature
+- Q: When should YouTube OAuth verification occur? → ...
+- Q: What YouTube OAuth scopes are required? → ...
+- Q: How should YouTube credentials be stored? → ...
+- Q: What happens if YouTube OAuth flow fails or is cancelled? → ...
 
 ## User Scenarios & Testing _(mandatory)_
 
@@ -40,39 +43,15 @@ A signed-in user clicks the upload button on the homepage, selects a video file,
 
 ---
 
+REMOVED: YouTube feature
 ### User Story 1.5 - YouTube OAuth Verification during Upload (Priority: P1)
-
-When a signed-in user without a valid YouTube connection initiates the upload process, the system automatically triggers the YouTube authorization flow to ensure the app can publish videos on their behalf.
-
-**Why this priority**: YouTube OAuth credentials are mandatory for the core value proposition of GoViral - automating video publishing to YouTube. Without valid credentials, the upload flow cannot complete its intended purpose.
-
-**Independent Test**: Can be fully tested by clearing YouTube credentials from a user's document and initiating an upload, verifying the OAuth flow triggers and credentials are stored upon completion.
-
-**Acceptance Scenarios**:
-
-1.  **Given** a user is signed-in and initiates an upload, **When** the system checks the user's document in MongoDB, **Then** it verifies if a valid (non-expired) YouTube access token exists.
-2.  **Given** the user has a valid YouTube access token, **When** the upload is initiated, **Then** the system proceeds to the /upload page without triggering the OAuth flow.
-3.  **Given** the user does not have a valid YouTube access token, **When** the upload is initiated, **Then** the system redirects the user to the YouTube OAuth consent screen with scope https://www.googleapis.com/auth/youtube.upload and https://www.googleapis.com/auth/youtube.
-4.  **Given** the user grants permission on the YouTube consent screen, **When** the system receives the authorization code, **Then** it exchanges it for an access token and refresh token.
-5.  **Given** OAuth tokens are received, **When** the backend stores them encrypted in MongoDB, **Then** the user is redirected to the /upload page to continue the upload.
-6.  **Given** the user cancels or denies OAuth consent, **When** the OAuth flow completes, **Then** the system shows an error: "YouTube authorization is required to upload videos. Please try again." and aborts the upload process.
 
 ---
 
+
+
+REMOVED: YouTube feature
 ### User Story 1.6 - Dedicated YouTube Connection (Priority: P2)
-
-A signed-in user can proactively connect their YouTube account at any time via a dedicated button in the application's main navigation/sidebar, without needing to start an upload.
-
-**Why this priority**: This improves user experience by allowing them to set up the YouTube connection independently, preventing interruption during the upload flow.
-
-**Independent Test**: Can be tested by a signed-in user clicking the 'Connect YouTube' button and completing the OAuth flow, then verifying the credentials are stored.
-
-**Acceptance Scenarios**:
-
-1.  **Given** a signed-in user has not yet connected their YouTube account, **When** they look at the Navbar/Sidebar, **Then** they see a button with the text 'Connect YouTube'.
-2.  **Given** the user clicks the 'Connect YouTube' button, **When** the action is triggered, **Then** the system redirects the user to the YouTube OAuth consent screen.
-3.  **Given** the user completes the authorization successfully, **When** they are redirected back to the app, **Then** the 'Connect YouTube' button is no longer visible or appears in a connected state.
-4.  **Given** a user has already connected their YouTube account, **When** they view the Navbar/Sidebar, **Then** the 'Connect YouTube' button is not present or is replaced with an indicator of the connected status.
 
 ---
 
@@ -117,8 +96,9 @@ Users receive clear feedback about upload status and completion, including progr
 - **How does system handle very long video files?**: System enforces a 60-second duration limit post-upload.
 - **What if Cloudinary service is unavailable?**: System should show an appropriate error message and suggest trying again later.
 - **What if agent service is unavailable when metadata is sent?**: System should retry or queue the request and notify the user of a delay.
-- **What if YouTube OAuth token expires during upload?**: System should detect expiry, attempt token refresh, and if refresh fails, prompt the user to re-authorize.
-- **What if user revokes YouTube permissions after initial authorization?**: System should detect the invalid token on the next action requiring authorization and re-trigger the OAuth flow.
+REMOVED: YouTube feature
+- **What if YouTube OAuth token expires during upload?**: ...
+- **What if user revokes YouTube permissions after initial authorization?**: ...
 
 ## Requirements _(mandatory)_
 
@@ -136,6 +116,7 @@ Users receive clear feedback about upload status and completion, including progr
 - **FR-008**: System MUST update the UI to show upload completion and success status.
 - **FR-009**: System MUST send upload data to the AI agent service (just a placeholder/dummy now but will be implemented in future feature) to initiate its execution loop.
 - **FR-010**: System MUST NOT implement upload state persistence. If a user navigates away from the page during an upload, the upload is cancelled.
+REMOVED: YouTube feature
 - **FR-011**: System MUST verify that a valid YouTube access token exists in the user's MongoDB document before performing an action that requires YouTube permissions.
 - **FR-012**: System MUST trigger the YouTube OAuth flow if a valid access token is missing when required.
 - **FR-013**: System MUST store the YouTube access token, refresh token, and expiry timestamp encrypted at rest in the User document.
@@ -155,13 +136,15 @@ _Assumptions_:
 - Post-upload security checks include duration validation (< 60 seconds), performed after receiving the file analysis from Cloudinary.
 - Cloudinary is the designated third-party service for video storage and metadata extraction.
 - The AI Agent Service is a future feature. For now, the Next.js backend will send the required data to a made-up/mock URL endpoint, and the request should be considered successful if it is sent without error.
+REMOVED: YouTube feature
 - YouTube OAuth uses Google's OAuth 2.0 flow with the authorization code grant type.
 
 ### Key Entities _(include if feature involves data)_
 
 - **VideoUpload**: Represents a video upload attempt, uniquely identified (e.g., UUID) and linked to the uploading user via Clerk ID, containing metadata such as cloudinary_url, file_size, duration, status (pending, processing, completed, failed, published), and error messages.
-- **User**: Represents the authenticated user initiating the upload, identified by Clerk ID (relationship: one user can have multiple video uploads). Contains YouTube OAuth credentials (youtubeAccessToken, youtubeRefreshToken, youtubeTokenExpiry) stored encrypted.
+- **User**: Represents the authenticated user initiating the upload, identified by Clerk ID (relationship: one user can have multiple video uploads).
 - **VideoMetadata**: Contains the cloudinary_url, video_size, duration, and other technical details extracted after upload.
+REMOVED: YouTube feature
 - **YouTubeCredentials**: Embedded document in User containing youtubeAccessToken (encrypted), youtubeRefreshToken (encrypted), youtubeTokenExpiry (timestamp), and youtubeChannelId for OAuth authentication with YouTube API.
 
 ## Success Criteria _(mandatory)_
@@ -169,4 +152,5 @@ _Assumptions_:
 - All functionality should work as described in the acceptance scenarios without any critical bugs or issues.
 - Users can successfully upload valid video files and see progress and completion feedback.
 - The entire feature is performant and SEO-optimized as per the non-functional requirements.
+REMOVED: YouTube feature
 - The YouTube connection flow can be initiated both from the upload process and a dedicated UI button.

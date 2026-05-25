@@ -3,7 +3,6 @@
 import Link from "next/link"
 import { FaCircleXmark } from "react-icons/fa6"
 import { SignedIn, SignedOut, UserButton } from "@clerk/nextjs"
-import ConnectYouTubeButton from "./ConnectYouTubeButton"
 
 interface SidebarProps {
   isOpen: boolean
@@ -69,11 +68,6 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
           >
             Videos
           </Link>
-
-          {/* Connect YouTube Button (only when signed in) */}
-          <SignedIn>
-            <ConnectYouTubeButton />
-          </SignedIn>
 
           <SignedOut>
             <Link
